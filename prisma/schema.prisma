@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  OWNER
+}
+
+enum ReservationStatus {
+  CONFIRMADO
+  PENDENTE
+  CANCELADO
+  FINALIZADO
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  name         String?
+  passwordHash String
+  role         UserRole      @default(USER)
+  resources    Resource[]
+  reservations Reservation[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Comment      Comment[]
+}
+
+model Resource {
+  id             String         @id @default(uuid())
+  name           String
+  description    String?
+  owner          User           @relation(fields: [ownerId], references: [id])
+  ownerId        String
+  pricePerHour   Decimal
+  // availabilities Availability[]
+  reservations   Reservation[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  Comment        Comment[]
+  // Blocked        Blocked[]
+}
+
+// model Blocked {
+//   id           String   @id @default(uuid())
+//   resourceId   String
+//   resource     Resource @relation(fields: [resourceId], references: [id])
+//   blockedStart DateTime
+//   blockedEnd   DateTime
+//   reason       String
+// }
+
+// model Availability {
+//   id         String   @id @default(uuid())
+//   startTime  DateTime
+//   endTime    DateTime
+//   resource   Resource @relation(fields: [resourceId], references: [id])
+//   resourceId String
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
+// }
+
+model Reservation {
+  id         String            @id @default(uuid())
+  startTime  DateTime
+  endTime    DateTime
+  user       User              @relation(fields: [userId], references: [id])
+  userId     String
+  resource   Resource          @relation(fields: [resourceId], references: [id])
+  totalPrice Decimal
+  resourceId String
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  status     ReservationStatus @default(PENDENTE)
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  comment    String
+  userId     String
+  resourceId String
+  user       User     @relation(fields: [userId], references: [id])
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
