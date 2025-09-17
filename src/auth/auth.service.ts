@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -29,7 +33,21 @@ export class AuthService {
   }
 
   async signIn(SignInDto: SignInDto) {
-    // Lógica futura de login
-    return 'Esta ação retorna um usuário logado';
+    const loginEncontrado = await this.prismaService.user.findUnique({
+      where: {
+        email: SignInDto.email,
+      },
+    });
+    if (!loginEncontrado) {
+      throw new UnauthorizedException('Usuário ou senha incorretos');
+    }
+    const passwordCheck = await bcrypt.compare(
+      SignInDto.password,
+      loginEncontrado.password,
+    );
+    if (!passwordCheck) {
+      throw new UnauthorizedException('Usuário ou senha incorretos');
+    }
+    return user;
   }
 }
