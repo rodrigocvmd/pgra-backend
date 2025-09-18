@@ -10,7 +10,10 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async signUp(SignUpDto: SignUpDto) {
     const usuarioEncontrado = await this.prismaService.user.findMany({
@@ -48,6 +51,9 @@ export class AuthService {
     if (!passwordCheck) {
       throw new UnauthorizedException('Usuário ou senha incorretos');
     }
-    return user;
+    const payload = { sub: loginEncontrado.id, email: loginEncontrado.email };
+    const accessToken = this.jwtService.sign(payload);
+
+    return { access_token: accessToken };
   }
 }
