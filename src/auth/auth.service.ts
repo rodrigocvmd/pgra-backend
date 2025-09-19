@@ -7,6 +7,7 @@ import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -27,10 +28,10 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(SignUpDto.password, 10);
     return this.prismaService.user.create({
       data: {
-        email: signUpDto.email,
-        name: signUpDto.name,
-        password: hashedPassword,
-        role: signUpDto.role,
+        email: SignUpDto.email,
+        name: SignUpDto.name,
+        passwordHash: hashedPassword,
+        role: 'USER',
       },
     });
   }
@@ -46,7 +47,7 @@ export class AuthService {
     }
     const passwordCheck = await bcrypt.compare(
       SignInDto.password,
-      loginEncontrado.password,
+      loginEncontrado.passwordHash,
     );
     if (!passwordCheck) {
       throw new UnauthorizedException('Usuário ou senha incorretos');

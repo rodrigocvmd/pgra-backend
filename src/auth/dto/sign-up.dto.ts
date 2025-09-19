@@ -2,7 +2,6 @@ import {
   IsEnum,
   IsString,
   IsEmail,
-  IsString,
   MinLength,
 } from 'class-validator';
 import { UserRole } from '@prisma/client';
