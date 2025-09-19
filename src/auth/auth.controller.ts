@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -11,6 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
+import type { AuthRequest } from './types';
 
 @Controller('auth')
 export class AuthController {
@@ -30,7 +32,7 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(AuthGuard('jwt'))
-  getProfile() {
-    return { message: 'Bem-vindo! Você está autenticado.' };
+  getProfile(@Req() request: AuthRequest) {
+    return request.user;
   }
 }
