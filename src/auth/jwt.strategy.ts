@@ -8,8 +8,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: 'chaveSecreta',
     });
   }
-  
-  async validate(payload: { sub: string; email: string; name: string }) {
+
+  validate(payload: { sub: string; email: string; name: string }) {
     // O Passport.js anexa este objeto ao request.user
     return { id: payload.sub, email: payload.email, name: payload.name };
   }

@@ -28,10 +28,6 @@ export class ResourceService {
     return this.prismaService.resource.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} resource`;
-  }
-
   async update(
     resourceId: string,
     userId: string,
@@ -53,9 +49,5 @@ export class ResourceService {
       where: { id: resourceId },
       data: updateResourceDto,
     });
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} resource`;
   }
 }
