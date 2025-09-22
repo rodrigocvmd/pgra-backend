@@ -42,11 +42,17 @@ export class ResourceController {
   }
 
   @Patch(':id')
+  @UsePipes(ValidationPipe)
   update(
-    @Param('id') id: string,
+    @Param('id') resourceId: string,
+    @Req() request: AuthRequest,
     @Body() updateResourceDto: UpdateResourceDto,
   ) {
-    return this.resourceService.update(+id, updateResourceDto);
+    return this.resourceService.update(
+      resourceId,
+      request.user.id,
+      updateResourceDto,
+    );
   }
 
   @Delete(':id')

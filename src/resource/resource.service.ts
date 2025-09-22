@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -28,8 +32,27 @@ export class ResourceService {
     return `This action returns a #${id} resource`;
   }
 
-  update(id: number, updateResourceDto: UpdateResourceDto) {
-    return `This action updates a #${id} resource`;
+  async update(
+    resourceId: string,
+    userId: string,
+    updateResourceDto: UpdateResourceDto,
+  ) {
+    const resource = await this.prismaService.resource.findUnique({
+      where: { id: resourceId },
+    });
+
+    if (!resource) {
+      throw new NotFoundException('Usuário não é o proprietário do recurso.');
+    }
+    if (resource.ownerId !== userId) {
+      throw new ForbiddenException(
+        'Você não tem permissão para editar este recurso.',
+      );
+    }
+    return this.prismaService.resource.update({
+      where: { id: resourceId },
+      data: updateResourceDto,
+    });
   }
 
   remove(id: number) {
