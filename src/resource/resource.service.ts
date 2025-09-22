@@ -7,8 +7,17 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ResourceService {
   constructor(private prismaService: PrismaService) {}
 
-  create(createResourceDto: CreateResourceDto) {
-    return 'This action adds a new resource';
+  async create(createResourceDto: CreateResourceDto, ownerId: string) {
+    return this.prismaService.resource.create({
+      data: {
+        name: createResourceDto.name,
+        description: createResourceDto.description,
+        pricePerHour: createResourceDto.pricePerHour,
+        owner: {
+          connect: { id: ownerId },
+        },
+      },
+    });
   }
 
   findAll() {

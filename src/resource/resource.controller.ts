@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
+  Req,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ResourceService } from './resource.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
+import type { AuthRequest } from 'src/auth/types';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('resource')
@@ -19,8 +23,12 @@ export class ResourceController {
   constructor(private readonly resourceService: ResourceService) {}
 
   @Post()
-  create(@Body() createResourceDto: CreateResourceDto) {
-    return this.resourceService.create(createResourceDto);
+  @UsePipes(ValidationPipe)
+  create(
+    @Body() createResourceDto: CreateResourceDto,
+    @Req() request: AuthRequest,
+  ) {
+    return this.resourceService.create(createResourceDto, request.user.id);
   }
 
   @Get()

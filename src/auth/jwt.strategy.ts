@@ -1,11 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 
-type JwtPayload = {
-  sub: string;
-  email: string;
-};
-
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
@@ -13,7 +8,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: 'chaveSecreta',
     });
   }
-  async validate(payload: JwtPayload) {
-    return payload;
+  
+  async validate(payload: { sub: string; email: string; name: string }) {
+    // O Passport.js anexa este objeto ao request.user
+    return { id: payload.sub, email: payload.email, name: payload.name };
   }
 }
