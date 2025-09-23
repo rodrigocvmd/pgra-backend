@@ -38,7 +38,7 @@ export class ResourceController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.resourceService.findOne(+id);
+    return this.resourceService.findOne(id);
   }
 
   @Patch(':id')
@@ -56,7 +56,7 @@ export class ResourceController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.resourceService.remove(+id);
+  remove(@Param('id') id: string, @Req() request: AuthRequest) {
+    return this.resourceService.remove(id, request.user.id);
   }
 }

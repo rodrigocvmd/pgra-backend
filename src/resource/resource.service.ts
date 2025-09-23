@@ -24,6 +24,14 @@ export class ResourceService {
     });
   }
 
+  async findOne(id: string) {
+    return this.prismaService.resource.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
   findAll() {
     return this.prismaService.resource.findMany();
   }
@@ -48,6 +56,27 @@ export class ResourceService {
     return this.prismaService.resource.update({
       where: { id: resourceId },
       data: updateResourceDto,
+    });
+  }
+
+  async remove(id: string, userId: string) {
+    const resource = await this.prismaService.resource.findUnique({
+      where: { id },
+    });
+
+    if (!resource) {
+      throw new NotFoundException('Recurso não encontrado');
+    }
+
+    if (resource.ownerId !== userId) {
+      throw new ForbiddenException(
+        'Você não tem permissão para deletar este recurso.',
+      );
+    }
+    return await this.prismaService.resource.delete({
+      where: {
+        id,
+      },
     });
   }
 }
