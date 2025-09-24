@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -37,17 +38,17 @@ model User {
 }
 
 model Resource {
-  id             String         @id @default(uuid())
-  name           String
-  description    String?
-  owner          User           @relation(fields: [ownerId], references: [id])
-  ownerId        String
-  pricePerHour   Decimal
+  id           String        @id @default(uuid())
+  name         String
+  description  String?
+  owner        User          @relation(fields: [ownerId], references: [id])
+  ownerId      String
+  pricePerHour Decimal
   // availabilities Availability[]
-  reservations   Reservation[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  Comment        Comment[]
+  reservations Reservation[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Comment      Comment[]
   // Blocked        Blocked[]
 }
 
