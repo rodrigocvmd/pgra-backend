@@ -17,6 +17,7 @@ import { UpdateBookingDto } from './dto/update-booking.dto';
 import type { AuthRequest } from 'src/auth/types';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { OwnerGuard } from 'src/auth/guards/owner/owner.guard';
+import { Entity } from 'src/auth/guards/owner/entity.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('booking')
@@ -43,24 +44,24 @@ export class BookingController {
   }
 
   @Get('me')
-  @UsePipes(ValidationPipe)
   getBookingsByUser(@Req() request: AuthRequest) {
     return this.bookingService.getBookingsByUser(request.user.id);
   }
 
   @Patch(':id')
   @UseGuards(OwnerGuard)
+  @Entity('reservation')
   update(
     @Param('id') id: string,
-    @Req() request: AuthRequest,
     @Body() updateBookingDto: UpdateBookingDto,
   ) {
-    return this.bookingService.update(id, request.user.id, updateBookingDto);
+    return this.bookingService.update(id, updateBookingDto);
   }
 
   @Delete(':id')
   @UseGuards(OwnerGuard)
-  remove(@Param('id') id: string, @Req() request: AuthRequest) {
-    return this.bookingService.remove(id, request.user.id);
+  @Entity('reservation')
+  remove(@Param('id') id: string) {
+    return this.bookingService.remove(id);
   }
 }

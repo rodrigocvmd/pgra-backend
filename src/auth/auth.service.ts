@@ -52,7 +52,11 @@ export class AuthService {
     if (!passwordCheck) {
       throw new UnauthorizedException('Usuário ou senha incorretos');
     }
-    const payload = { sub: loginEncontrado.id, email: loginEncontrado.email };
+    const payload = {
+      sub: loginEncontrado.id,
+      email: loginEncontrado.email,
+      role: loginEncontrado.role,
+    };
     const accessToken = this.jwtService.sign(payload);
 
     return { access_token: accessToken };

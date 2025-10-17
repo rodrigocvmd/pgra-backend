@@ -62,7 +62,7 @@ export class BookingService {
   }
 
   findAll() {
-    return `This action returns all booking`;
+    return this.prismaService.reservation.findMany();
   }
 
   async findOne(id: string) {
@@ -88,14 +88,13 @@ export class BookingService {
 
   async update(
     reservationId: string,
-    userId: string,
     updateBookingDto: UpdateBookingDto,
   ) {
     const reservation = await this.prismaService.reservation.findUnique({
       where: { id: reservationId },
     });
     if (!reservation) {
-      throw new NotFoundException('Recurso não encontrado.');
+      throw new NotFoundException('Reserva não encontrada.');
     }
 
     const resource = await this.prismaService.resource.findUnique({
@@ -136,7 +135,7 @@ export class BookingService {
     });
   }
 
-  async remove(id: string, userId: string) {
+  async remove(id: string) {
     const reservation = await this.prismaService.reservation.findUnique({
       where: { id },
     });
@@ -144,11 +143,7 @@ export class BookingService {
     if (!reservation) {
       throw new NotFoundException('Reserva não encontrada.');
     }
-    if (reservation.userId !== userId) {
-      throw new ForbiddenException(
-        'Você não tem permissão para deletar esta reserva.',
-      );
-    }
+
     return await this.prismaService.reservation.delete({
       where: { id },
     });
