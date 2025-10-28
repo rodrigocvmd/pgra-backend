@@ -18,6 +18,12 @@ export class RolesGuard implements CanActivate {
     }
 
     const { user } = context.switchToHttp().getRequest();
-    return requiredRoles.some((role) => user.role?.includes(role));
+
+    // Se o usuário não estiver na requisição (problema com JwtAuthGuard) ou não tiver um papel, negue.
+    if (!user || !user.role) {
+      return false;
+    }
+
+    return requiredRoles.some((role) => user.role.includes(role));
   }
 }

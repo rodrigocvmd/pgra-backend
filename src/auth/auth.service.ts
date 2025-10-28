@@ -17,6 +17,7 @@ export class AuthService {
   ) {}
 
   async signUp(SignUpDto: SignUpDto) {
+    console.log('SignUp DTO Recebido:', SignUpDto);
     const usuarioEncontrado = await this.prismaService.user.findMany({
       where: {
         email: SignUpDto.email,

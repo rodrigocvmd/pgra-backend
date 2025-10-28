@@ -8,10 +8,14 @@ import { UpdateResourceDto } from './dto/update-resource.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAvailabilityDto } from './dto/create-availability.dto';
 import { CreateBlockedDto } from './dto/create-blocked.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ResourceService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private jwtService: JwtService,
+  ) {}
 
   async create(createResourceDto: CreateResourceDto, ownerId: string) {
     return this.prismaService.$transaction(async (prisma) => {
@@ -20,16 +24,24 @@ export class ResourceService {
       });
 
       if (!user) {
-        // Embora o JwtAuthGuard deva impedir isso, é uma boa prática de segurança.
         throw new NotFoundException('Usuário não encontrado.');
       }
 
-      // Se o usuário for um USER, promova-o a OWNER.
+      let newAccessToken: string | null = null;
+
+      // Se o usuário for um USER, promova-o a OWNER e gere um novo token.
       if (user.role === 'USER') {
-        await prisma.user.update({
+        const updatedUser = await prisma.user.update({
           where: { id: ownerId },
           data: { role: 'OWNER' },
         });
+
+        const payload = {
+          sub: updatedUser.id,
+          email: updatedUser.email,
+          role: updatedUser.role,
+        };
+        newAccessToken = this.jwtService.sign(payload);
       }
 
       // Crie o recurso.
@@ -44,7 +56,7 @@ export class ResourceService {
         },
       });
 
-      return resource;
+      return { resource, newAccessToken };
     });
   }
 
@@ -58,6 +70,14 @@ export class ResourceService {
 
   findAll() {
     return this.prismaService.resource.findMany();
+  }
+
+  async findMyResources(ownerId: string) {
+    return this.prismaService.resource.findMany({
+      where: {
+        ownerId,
+      },
+    });
   }
 
   async update(

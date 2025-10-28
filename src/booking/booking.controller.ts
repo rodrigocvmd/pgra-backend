@@ -28,11 +28,12 @@ export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
   @Post()
-  @UsePipes(ValidationPipe)
   create(
     @Body() createBookingDto: CreateBookingDto,
     @Req() request: AuthRequest,
   ) {
+    console.log('DTO recebido no Controller:', createBookingDto);
+    console.log('Tipo de startTime:', typeof createBookingDto.startTime);
     return this.bookingService.create(createBookingDto, request.user.id);
   }
 
@@ -43,6 +44,7 @@ export class BookingController {
   }
 
   @Get('me')
+  @UseGuards(JwtAuthGuard)
   getBookingsByUser(@Req() request: AuthRequest) {
     return this.bookingService.getBookingsByUser(request.user.id);
   }

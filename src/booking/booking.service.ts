@@ -26,7 +26,9 @@ export class BookingService {
   }
 
   async create(createBookingDto: CreateBookingDto, userId: string) {
-    const { resourceId, startTime, endTime } = createBookingDto;
+    const { resourceId } = createBookingDto;
+    const startTime = new Date(createBookingDto.startTime);
+    const endTime = new Date(createBookingDto.endTime);
 
     const resource = await this.prismaService.resource.findUnique({
       where: {
@@ -115,12 +117,19 @@ export class BookingService {
   }
 
   async getBookingsByUser(userId: string) {
-    const reservation = await this.prismaService.reservation.findMany({
+    return this.prismaService.reservation.findMany({
       where: {
         userId,
       },
+      include: {
+        resource: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
-    return reservation;
   }
 
   async getBookingsForOwner(ownerId: string) {
@@ -215,8 +224,10 @@ export class BookingService {
     if (!resource) {
       throw new NotFoundException('Recurso não encontrado.');
     }
-    const newEndTime = updateBookingDto.endTime || reservation.endTime;
-    const newStartTime = updateBookingDto.startTime || reservation.startTime;
+    
+    // Converte as strings para Datas, se existirem
+    const newStartTime = updateBookingDto.startTime ? new Date(updateBookingDto.startTime) : reservation.startTime;
+    const newEndTime = updateBookingDto.endTime ? new Date(updateBookingDto.endTime) : reservation.endTime;
 
     const durationInHours =
       (newEndTime.getTime() - newStartTime.getTime()) / 3600000;
@@ -243,7 +254,12 @@ export class BookingService {
 
     return this.prismaService.reservation.update({
       where: { id: reservationId },
-      data: { ...updateBookingDto, totalPrice: calculatedPrice },
+      data: { 
+        ...updateBookingDto, 
+        startTime: newStartTime,
+        endTime: newEndTime,
+        totalPrice: calculatedPrice 
+      },
     });
   }
 
