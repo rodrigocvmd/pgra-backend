@@ -75,7 +75,7 @@ export default function EditResourcePage() {
     e.preventDefault();
     setError(null);
     try {
-      await api.patch(`/resource/${id}`, { name, description, imageUrl, pricePerHour: parseFloat(pricePerHour) });
+      await api.patch(`/resource/${id}`, { name, description, imageUrl: imageUrl || null, pricePerHour: parseFloat(pricePerHour) });
       router.push('/resources/me');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Falha ao atualizar o recurso.');

@@ -75,6 +75,7 @@ export class ResourceService {
       include: {
         owner: {
           select: {
+            id: true,
             name: true,
           },
         },

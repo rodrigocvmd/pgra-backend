@@ -27,7 +27,7 @@ export default function CreateResourcePage() {
       const response = await api.post('/resource', {
         name,
         description,
-        imageUrl,
+        imageUrl: imageUrl || null,
         pricePerHour: parseFloat(pricePerHour),
       });
       

@@ -13,10 +13,10 @@ export class SignUpDto {
   @ApiProperty({
     description: 'O nome do novo usuário',
     example: 'Jane Doe',
-    required: false,
   })
   @IsString()
-  name?: string;
+  @IsNotEmpty()
+  name: string;
 
   @ApiProperty({
     description: 'A senha para o novo usuário (mínimo de 8 caracteres)',

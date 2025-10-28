@@ -82,7 +82,7 @@ export default function ResourceDetailPage() {
           <h1 className="text-4xl font-bold mb-4">{resource.name}</h1>
           <p className="text-lg text-gray-600 mb-6">{resource.description || 'Sem descrição.'}</p>
           <p className="text-3xl font-bold text-green-600">
-            R$ {Number(resource.pricePerHour).toFixed(2)} / hora
+            R$ {Number(resource.pricePerHour).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / hora
           </p>
         </div>
 

@@ -69,38 +69,38 @@ export default function MyBookingsPage() {
 
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-6">Minhas Reservas</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Minhas Reservas</h1>
       {bookings.length === 0 ? (
-        <p>Você ainda não fez nenhuma reserva.</p>
+        <p className="text-gray-600 dark:text-gray-400">Você ainda não fez nenhuma reserva.</p>
       ) : (
         <div className="space-y-4">
           {bookings.map((booking) => (
-            <div key={booking.id} className="bg-white p-6 rounded-lg shadow-md">
+            <div key={booking.id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-semibold text-lg">{booking.resource.name}</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="font-semibold text-lg text-gray-900 dark:text-white">{booking.resource.name}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     De: {new Date(booking.startTime).toLocaleString()}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     Até: {new Date(booking.endTime).toLocaleString()}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-lg">
-                    R$ {Number(booking.totalPrice).toFixed(2)}
+                  <p className="font-bold text-lg text-green-600 dark:text-green-400">
+                    R$ {Number(booking.totalPrice).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                   <span className={`px-3 py-1 text-sm rounded-full ${
-                    booking.status === 'CONFIRMADO' ? 'bg-green-200 text-green-800' :
-                    booking.status === 'PENDENTE' ? 'bg-yellow-200 text-yellow-800' :
-                    'bg-red-200 text-red-800'
+                    booking.status === 'CONFIRMADO' ? 'bg-green-200 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                    booking.status === 'PENDENTE' ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                    'bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-200'
                   }`}>
                     {booking.status}
                   </span>
                 </div>
               </div>
               {(booking.status === 'PENDENTE' || booking.status === 'CONFIRMADO') && (
-                <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
                   <button
                     onClick={() => handleCancel(booking.id)}
                     className="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
