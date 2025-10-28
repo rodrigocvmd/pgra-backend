@@ -1,8 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { AuthUser } from 'src/auth/types';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -34,7 +40,13 @@ export class UserService {
     return newUser;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto, user: AuthUser) {
+    if (user.role !== UserRole.ADMIN && user.id !== id) {
+      throw new ForbiddenException(
+        'Você não tem permissão para atualizar este usuário.',
+      );
+    }
+
     const dataToUpdate: any = { ...updateUserDto };
 
     if (updateUserDto.password) {
@@ -44,6 +56,23 @@ export class UserService {
     return this.prismaService.user.update({
       where: { id },
       data: dataToUpdate,
+    });
+  }
+
+  async promoteToOwner(id: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    return this.prismaService.user.update({
+      where: { id },
+      data: {
+        role: UserRole.OWNER,
+      },
     });
   }
 

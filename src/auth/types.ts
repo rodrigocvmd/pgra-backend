@@ -1,6 +1,12 @@
 import { Request as ExpressRequest } from 'express';
-import { User } from '@prisma/client';
+import { UserRole } from '@prisma/client';
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  role: UserRole;
+}
 
 export interface AuthRequest extends ExpressRequest {
-  user: User;
+  user: AuthUser;
 }

@@ -6,6 +6,8 @@ import {
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AuthUser } from 'src/auth/types';
+import { ReservationStatus, UserRole } from '@prisma/client';
 
 @Injectable()
 export class BookingService {
@@ -24,26 +26,61 @@ export class BookingService {
   }
 
   async create(createBookingDto: CreateBookingDto, userId: string) {
+    const { resourceId, startTime, endTime } = createBookingDto;
+
     const resource = await this.prismaService.resource.findUnique({
       where: {
-        id: createBookingDto.resourceId,
+        id: resourceId,
       },
     });
     if (!resource) {
       throw new NotFoundException('Recurso não encontrado');
     }
 
+    // 1. Verificar períodos bloqueados
+    const blockedPeriod = await this.prismaService.blocked.findFirst({
+      where: {
+        resourceId,
+        AND: [
+          { blockedEnd: { gt: startTime } },
+          { blockedStart: { lt: endTime } },
+        ],
+      },
+    });
+
+    if (blockedPeriod) {
+      throw new ForbiddenException(
+        'O recurso está bloqueado neste período.',
+      );
+    }
+
+    // 2. Verificar disponibilidade
+    const availabilities = await this.prismaService.availability.findMany({
+      where: { resourceId },
+    });
+
+    if (availabilities.length > 0) {
+      const isAvailable = availabilities.some(
+        (avail) =>
+          startTime >= avail.startTime && endTime <= avail.endTime,
+      );
+      if (!isAvailable) {
+        throw new ForbiddenException(
+          'O recurso não está disponível neste período.',
+        );
+      }
+    }
+
+    // 3. Verificar reservas conflitantes (lógica existente)
     const durationInHours =
-      (createBookingDto.endTime.getTime() -
-        createBookingDto.startTime.getTime()) /
-      3600000;
+      (endTime.getTime() - startTime.getTime()) / 3600000;
     const calculatedPrice = durationInHours * resource.pricePerHour.toNumber();
     const conflictingBooking = await this.prismaService.reservation.findFirst({
       where: {
-        resourceId: createBookingDto.resourceId,
+        resourceId: resourceId,
         AND: [
-          { endTime: { gt: createBookingDto.startTime } },
-          { startTime: { lt: createBookingDto.endTime } },
+          { endTime: { gt: startTime } },
+          { startTime: { lt: endTime } },
         ],
       },
     });
@@ -52,9 +89,9 @@ export class BookingService {
     }
     return this.prismaService.reservation.create({
       data: {
-        startTime: createBookingDto.startTime,
-        endTime: createBookingDto.endTime,
-        resourceId: createBookingDto.resourceId,
+        startTime,
+        endTime,
+        resourceId,
         userId: userId,
         totalPrice: calculatedPrice,
       },
@@ -84,6 +121,81 @@ export class BookingService {
       },
     });
     return reservation;
+  }
+
+  async getBookingsForOwner(ownerId: string) {
+    return this.prismaService.reservation.findMany({
+      where: {
+        resource: {
+          ownerId,
+        },
+      },
+      include: {
+        resource: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  async confirmBooking(id: string, user: AuthUser) {
+    const reservation = await this.prismaService.reservation.findUnique({
+      where: { id },
+      include: { resource: true },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Reserva não encontrada.');
+    }
+
+    if (
+      user.role !== UserRole.ADMIN &&
+      reservation.resource.ownerId !== user.id
+    ) {
+      throw new ForbiddenException(
+        'Você não tem permissão para confirmar esta reserva.',
+      );
+    }
+
+    return this.prismaService.reservation.update({
+      where: { id },
+      data: { status: ReservationStatus.CONFIRMADO },
+    });
+  }
+
+  async cancelBooking(id: string, user: AuthUser) {
+    const reservation = await this.prismaService.reservation.findUnique({
+      where: { id },
+      include: { resource: true },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Reserva não encontrada.');
+    }
+
+    const isOwner = reservation.resource.ownerId === user.id;
+    const isUser = reservation.userId === user.id;
+
+    if (user.role !== UserRole.ADMIN && !isOwner && !isUser) {
+      throw new ForbiddenException(
+        'Você não tem permissão para cancelar esta reserva.',
+      );
+    }
+
+    return this.prismaService.reservation.update({
+      where: { id },
+      data: { status: ReservationStatus.CANCELADO },
+    });
   }
 
   async update(
