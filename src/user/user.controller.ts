@@ -9,6 +9,7 @@ import {
   UsePipes,
   ValidationPipe,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
@@ -17,6 +18,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/auth/guards/roles/roles.decorator';
 import { UserRole } from '@prisma/client';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
+import type { AuthRequest } from 'src/auth/types';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('user')
