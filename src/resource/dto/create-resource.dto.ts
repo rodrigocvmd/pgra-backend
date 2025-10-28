@@ -1,14 +1,19 @@
-import { Decimal } from '@prisma/client/runtime/library';
-import { IsNumber, IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class CreateResourceDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
   @IsString()
   @IsOptional()
-  description: string;
+  description?: string;
+
+  @IsUrl()
+  @IsOptional()
+  imageUrl?: string;
+
   @IsNumber()
   @IsNotEmpty()
-  pricePerHour: Decimal;
+  pricePerHour: number;
 }

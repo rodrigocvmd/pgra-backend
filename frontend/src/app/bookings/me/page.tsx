@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
@@ -24,31 +24,40 @@ export default function MyBookingsPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    // Se a autenticação ainda está carregando, não faça nada.
-    if (isAuthLoading) {
-      return;
+  const fetchBookings = useCallback(async () => {
+    if (!user) return;
+    try {
+      setIsLoading(true);
+      const response = await api.get('/booking/me');
+      setBookings(response.data);
+    } catch (err) {
+      console.error("Failed to fetch bookings:", err);
+      setError("Não foi possível carregar suas reservas.");
+    } finally {
+      setIsLoading(false);
     }
-    // Se não houver usuário após o carregamento, redirecione para o login.
+  }, [user]);
+
+  useEffect(() => {
+    if (isAuthLoading) return;
     if (!user) {
       router.push('/login');
       return;
     }
-
-    const fetchBookings = async () => {
-      try {
-        const response = await api.get('/booking/me');
-        setBookings(response.data);
-      } catch (err) {
-        console.error("Failed to fetch bookings:", err);
-        setError("Não foi possível carregar suas reservas.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchBookings();
-  }, [user, isAuthLoading, router]);
+  }, [user, isAuthLoading, router, fetchBookings]);
+
+  const handleCancel = async (bookingId: string) => {
+    if (window.confirm("Tem certeza que deseja cancelar esta reserva?")) {
+      try {
+        await api.patch(`/booking/${bookingId}/cancel`);
+        fetchBookings(); // Recarrega as reservas para mostrar o status atualizado
+      } catch (err) {
+        console.error("Failed to cancel booking:", err);
+        setError("Não foi possível cancelar a reserva.");
+      }
+    }
+  };
 
   if (isLoading || isAuthLoading) {
     return <div className="text-center p-8">Carregando reservas...</div>;
@@ -90,6 +99,16 @@ export default function MyBookingsPage() {
                   </span>
                 </div>
               </div>
+              {(booking.status === 'PENDENTE' || booking.status === 'CONFIRMADO') && (
+                <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
+                  <button
+                    onClick={() => handleCancel(booking.id)}
+                    className="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
+                  >
+                    Cancelar Reserva
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

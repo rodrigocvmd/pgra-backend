@@ -62,9 +62,7 @@ export default function ResourceDetailPage() {
         startTime: new Date(startTime).toISOString(),
         endTime: new Date(endTime).toISOString(),
       };
-      console.log('Enviando para a API:', payload); // <-- LOG DE DEPURAÇÃO
       await api.post('/booking', payload);
-      // Sucesso! Redireciona para a página de "Minhas Reservas"
       router.push('/bookings/me');
     } catch (err: any) {
       console.error("Failed to create booking:", err);

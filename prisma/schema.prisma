@@ -41,10 +41,11 @@ model Resource {
   id             String          @id @default(uuid())
   name           String
   description    String?
+  imageUrl       String?
   owner          User            @relation(fields: [ownerId], references: [id])
   ownerId        String
   pricePerHour   Decimal
-  availabilities Availability[]
+  // availabilities Availability[]
   reservations   Reservation[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -61,15 +62,15 @@ model Blocked {
   reason       String
 }
 
-model Availability {
-  id         String   @id @default(uuid())
-  startTime  DateTime
-  endTime    DateTime
-  resource   Resource @relation(fields: [resourceId], references: [id])
-  resourceId String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
+// model Availability {
+//   id         String   @id @default(uuid())
+//   startTime  DateTime
+//   endTime    DateTime
+//   resource   Resource @relation(fields: [resourceId], references: [id])
+//   resourceId String
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
+// }
 
 model Reservation {
   id         String            @id @default(uuid())

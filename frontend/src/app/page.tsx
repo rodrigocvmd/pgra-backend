@@ -1,11 +1,16 @@
 import api from "@/lib/api";
 import Link from "next/link";
+import Image from "next/image"; // Importar o componente de Imagem do Next.js
 
 interface Resource {
   id: string;
   name: string;
   description: string | null;
+  imageUrl: string | null;
   pricePerHour: number;
+  owner: {
+    name: string | null;
+  };
 }
 
 async function getResources(): Promise<Resource[]> {
@@ -35,12 +40,25 @@ export default async function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {resources.map((resource) => (
             <Link href={`/resources/${resource.id}`} key={resource.id}>
-              <div className="bg-white rounded-lg shadow-md p-6 h-full hover:shadow-xl transition-shadow duration-200 cursor-pointer">
-                <h2 className="text-2xl font-semibold mb-2">{resource.name}</h2>
-                <p className="text-gray-600 mb-4">{resource.description || 'Sem descrição.'}</p>
-                <p className="text-xl font-bold text-right text-green-600">
-                  R$ {Number(resource.pricePerHour).toFixed(2)} / hora
-                </p>
+              <div className="bg-white rounded-lg shadow-md h-full overflow-hidden hover:shadow-xl transition-shadow duration-200 cursor-pointer flex flex-col">
+                <div className="relative w-full h-48">
+                  <Image
+                    src={resource.imageUrl || '/placeholder.png'}
+                    alt={resource.name}
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </div>
+                <div className="p-6 flex-grow flex flex-col">
+                  <h2 className="text-2xl font-semibold mb-2">{resource.name}</h2>
+                  <p className="text-sm text-gray-500 mb-2">
+                    de {resource.owner?.name || 'Proprietário desconhecido'}
+                  </p>
+                  <p className="text-gray-600 mb-4 flex-grow">{resource.description || 'Sem descrição.'}</p>
+                  <p className="text-xl font-bold text-right text-green-600 mt-auto">
+                    R$ {Number(resource.pricePerHour).toFixed(2)} / hora
+                  </p>
+                </div>
               </div>
             </Link>
           ))}

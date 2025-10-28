@@ -6,7 +6,6 @@ import {
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateAvailabilityDto } from './dto/create-availability.dto';
 import { CreateBlockedDto } from './dto/create-blocked.dto';
 import { JwtService } from '@nestjs/jwt';
 
@@ -65,11 +64,22 @@ export class ResourceService {
       where: {
         id,
       },
+      include: {
+        Blocked: true, // O nome do modelo no Prisma é 'Blocked' com 'B' maiúsculo
+      },
     });
   }
 
   findAll() {
-    return this.prismaService.resource.findMany();
+    return this.prismaService.resource.findMany({
+      include: {
+        owner: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
   }
 
   async findMyResources(ownerId: string) {
@@ -110,18 +120,6 @@ export class ResourceService {
     return await this.prismaService.resource.delete({
       where: {
         id,
-      },
-    });
-  }
-
-  async addAvailability(
-    resourceId: string,
-    createAvailabilityDto: CreateAvailabilityDto,
-  ) {
-    return this.prismaService.availability.create({
-      data: {
-        resourceId,
-        ...createAvailabilityDto,
       },
     });
   }

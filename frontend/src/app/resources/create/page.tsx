@@ -9,6 +9,7 @@ export default function CreateResourcePage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [pricePerHour, setPricePerHour] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { user, login } = useAuth();
@@ -26,6 +27,7 @@ export default function CreateResourcePage() {
       const response = await api.post('/resource', {
         name,
         description,
+        imageUrl,
         pricePerHour: parseFloat(pricePerHour),
       });
       
@@ -72,6 +74,18 @@ export default function CreateResourcePage() {
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              className="block w-full px-3 py-2 mt-1 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
+              URL da Imagem (Opcional)
+            </label>
+            <input
+              id="imageUrl"
+              type="url"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
               className="block w-full px-3 py-2 mt-1 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>

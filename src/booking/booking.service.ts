@@ -56,23 +56,6 @@ export class BookingService {
       );
     }
 
-    // 2. Verificar disponibilidade
-    const availabilities = await this.prismaService.availability.findMany({
-      where: { resourceId },
-    });
-
-    if (availabilities.length > 0) {
-      const isAvailable = availabilities.some(
-        (avail) =>
-          startTime >= avail.startTime && endTime <= avail.endTime,
-      );
-      if (!isAvailable) {
-        throw new ForbiddenException(
-          'O recurso não está disponível neste período.',
-        );
-      }
-    }
-
     // 3. Verificar reservas conflitantes (lógica existente)
     const durationInHours =
       (endTime.getTime() - startTime.getTime()) / 3600000;

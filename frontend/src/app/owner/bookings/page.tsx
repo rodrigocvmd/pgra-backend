@@ -107,20 +107,20 @@ export default function ManageBookingsPage() {
                 {/* Coluna 3: Ações */}
                 <div className="flex justify-end space-x-2">
                   {booking.status === 'PENDENTE' && (
-                    <>
-                      <button
-                        onClick={() => handleUpdateStatus(booking.id, 'CONFIRMADO')}
-                        className="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600"
-                      >
-                        Confirmar
-                      </button>
-                      <button
-                        onClick={() => handleUpdateStatus(booking.id, 'CANCELADO')}
-                        className="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
-                      >
-                        Recusar
-                      </button>
-                    </>
+                    <button
+                      onClick={() => handleUpdateStatus(booking.id, 'CONFIRMADO')}
+                      className="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600"
+                    >
+                      Confirmar
+                    </button>
+                  )}
+                  {(booking.status === 'PENDENTE' || booking.status === 'CONFIRMADO') && (
+                    <button
+                      onClick={() => handleUpdateStatus(booking.id, 'CANCELADO')}
+                      className="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
+                    >
+                      {booking.status === 'PENDENTE' ? 'Recusar' : 'Cancelar'}
+                    </button>
                   )}
                 </div>
               </div>

@@ -30,8 +30,6 @@ import { CreateResourceDto } from './dto/create-resource.dto';
 
 import { UpdateResourceDto } from './dto/update-resource.dto';
 
-import { CreateAvailabilityDto } from './dto/create-availability.dto';
-
 import { CreateBlockedDto } from './dto/create-blocked.dto';
 
 import type { AuthRequest } from 'src/auth/types';
@@ -49,6 +47,8 @@ import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { UserRole } from '@prisma/client';
 
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+
 
 
 
@@ -189,44 +189,6 @@ export class ResourceController {
   remove(@Param('id') id: string) {
 
     return this.resourceService.remove(id);
-
-  }
-
-
-
-  @Post(':id/availability')
-
-  @UseGuards(JwtAuthGuard, OwnerGuard)
-
-  @ApiBearerAuth()
-
-  @Entity('resource')
-
-  @ApiOperation({
-
-    summary: 'Adiciona um período de disponibilidade a um recurso',
-
-    description: 'Apenas o proprietário do recurso ou um ADMIN pode fazer isso.',
-
-  })
-
-  @UsePipes(ValidationPipe)
-
-  addAvailability(
-
-    @Param('id') resourceId: string,
-
-    @Body() createAvailabilityDto: CreateAvailabilityDto,
-
-  ) {
-
-    return this.resourceService.addAvailability(
-
-      resourceId,
-
-      createAvailabilityDto,
-
-    );
 
   }
 
