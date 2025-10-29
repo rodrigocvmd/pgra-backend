@@ -6,6 +6,7 @@ import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import CustomAlert from '@/components/CustomAlert';
 import ConfirmationModal from '@/components/ConfirmationModal';
+import { AxiosError } from 'axios';
 
 // Interfaces
 interface Blocked {
@@ -59,8 +60,12 @@ export default function EditResourcePage() {
         setName(resData.name);
         setDescription(resData.description || '');
         setPricePerHour(String(resData.pricePerHour));
-      } catch (err) {
-        setError('Não foi possível carregar o recurso.');
+      } catch (err: unknown) {
+        if (err instanceof AxiosError) {
+          setError(err.response?.data?.message || 'Não foi possível carregar o recurso.');
+        } else {
+          setError('Não foi possível carregar o recurso.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -124,8 +129,12 @@ export default function EditResourcePage() {
         },
       });
       router.push('/resources/me');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Falha ao atualizar o recurso.');
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.message || 'Falha ao atualizar o recurso.');
+      } else {
+        setError('Falha ao atualizar o recurso.');
+      }
     }
   };
 
@@ -148,9 +157,13 @@ export default function EditResourcePage() {
       setBlockStartTime('');
       setBlockEndTime('');
       setBlockReason('');
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to add block', err);
-      setError('Falha ao adicionar período de bloqueio.');
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.message || 'Falha ao adicionar período de bloqueio.');
+      } else {
+        setError('Falha ao adicionar período de bloqueio.');
+      }
     }
   };
 
@@ -159,8 +172,12 @@ export default function EditResourcePage() {
     try {
       await api.delete(`/resource/${id}`);
       router.push('/resources/me');
-    } catch (err) {
-      setError('Falha ao deletar o recurso.');
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.message || 'Falha ao deletar o recurso.');
+      } else {
+        setError('Falha ao deletar o recurso.');
+      }
     }
   };
 
@@ -170,8 +187,12 @@ export default function EditResourcePage() {
       try {
         await api.delete(`/resource/block/${selectedBlockId}`);
         fetchResource(); // Recarrega os dados do recurso
-      } catch (err) {
-        setError('Falha ao remover o período de bloqueio.');
+      } catch (err: unknown) {
+        if (err instanceof AxiosError) {
+          setError(err.response?.data?.message || 'Falha ao remover o período de bloqueio.');
+        } else {
+          setError('Falha ao remover o período de bloqueio.');
+        }
       }
     }
   };
@@ -270,7 +291,7 @@ export default function EditResourcePage() {
                       htmlFor="image"
                       className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
                     >
-                      <span className='text-center'>Clique para carregar um arquivo</span>
+                      <span>Carregar um arquivo</span>
                       <input
                         id="image"
                         name="image"
@@ -280,9 +301,10 @@ export default function EditResourcePage() {
                         className="sr-only"
                       />
                     </label>
+                    <p className="pl-1">ou arraste e solte</p>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    PNG, JPG ou WEBP de até 10MB
+                    PNG, JPG, GIF, WEBP de até 10MB
                   </p>
                 </div>
               </div>

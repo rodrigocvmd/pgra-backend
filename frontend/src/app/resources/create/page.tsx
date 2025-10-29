@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import CustomAlert from '@/components/CustomAlert';
+import { AxiosError } from 'axios';
 
 export default function CreateResourcePage() {
   const [name, setName] = useState('');
@@ -65,7 +66,7 @@ export default function CreateResourcePage() {
     try {
       const response = await api.post('/resource', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'multipart/form-type',
         },
       });
       
@@ -74,9 +75,13 @@ export default function CreateResourcePage() {
       }
 
       router.push('/resources/me'); 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to create resource:', err);
-      setError(err.response?.data?.message || 'Falha ao criar o recurso.');
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.message || 'Falha ao criar o recurso.');
+      } else {
+        setError('Falha ao criar o recurso.');
+      }
     }
   };
 

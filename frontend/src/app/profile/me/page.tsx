@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
+import { AxiosError } from 'axios';
 
 export default function MyProfilePage() {
   const { user, logout, isLoading: isAuthLoading, login } = useAuth();
@@ -27,9 +28,13 @@ export default function MyProfilePage() {
           const response = await api.get('/auth/profile');
           setName(response.data.name || '');
           setEmail(response.data.email);
-        } catch (err) {
+        } catch (err: unknown) {
           console.error('Failed to fetch profile', err);
-          setError('Não foi possível carregar os dados do perfil.');
+          if (err instanceof AxiosError) {
+            setError(err.response?.data?.message || 'Não foi possível carregar os dados do perfil.');
+          } else {
+            setError('Não foi possível carregar os dados do perfil.');
+          }
         }
       };
       fetchUserData();
@@ -66,8 +71,12 @@ export default function MyProfilePage() {
       );
       setPassword('');
       setConfirmPassword('');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Falha ao atualizar o perfil.');
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.message || 'Falha ao atualizar o perfil.');
+      } else {
+        setError('Falha ao atualizar o perfil.');
+      }
     }
   };
 
