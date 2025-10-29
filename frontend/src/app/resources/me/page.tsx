@@ -97,14 +97,14 @@ export default function MyResourcesPage() {
 
   return (
     <div className="container mx-auto p-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h1 className="text-3xl font-bold">Meus Recursos</h1>
 
-        <div className="flex space-x-4">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           {user && (user.role === 'OWNER' || user.role === 'ADMIN') && (
             <Link
               href="/owner/bookings"
-              className="bg-gray-500 text-white rounded-md hover:bg-gray-600 font-bold py-2 px-4 rounded cursor-pointer"
+              className="bg-gray-500 text-white rounded-md hover:bg-gray-600 font-bold py-2 px-4 rounded cursor-pointer text-center"
             >
               Gerenciar Reservas dos seus Recursos
             </Link>
@@ -112,7 +112,7 @@ export default function MyResourcesPage() {
 
           <Link
             href="/resources/create"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded cursor-pointer"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded cursor-pointer text-center"
           >
             + Novo Recurso
           </Link>

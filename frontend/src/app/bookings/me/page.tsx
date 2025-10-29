@@ -92,10 +92,10 @@ export default function MyBookingsPage() {
       {bookingList.map((booking) => (
         <div
           key={booking.id}
-          className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex space-x-4 items-start"
+          className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-col sm:flex-row sm:space-x-4 sm:items-start"
         >
           <Link href={`/resources/${booking.resource.id}`}>
-            <div className="flex-shrink-0 h-24 w-24 relative cursor-pointer">
+            <div className="flex-shrink-0 h-24 w-full sm:w-24 relative cursor-pointer mb-4 sm:mb-0">
               <Image
                 src={booking.resource.imageUrl || '/placeholder.png'}
                 alt={booking.resource.name}
@@ -118,7 +118,7 @@ export default function MyBookingsPage() {
               Até: {new Date(booking.endTime).toLocaleString('pt-BR')}
             </p>
           </div>
-          <div className="text-right space-y-2 flex-shrink-0">
+          <div className="text-left sm:text-right space-y-2 flex-shrink-0 mt-4 sm:mt-0">
             <p className="font-bold text-lg text-gray-600 dark:text-gray-100">
               R${' '}
               {Number(booking.totalPrice).toLocaleString('pt-BR', {

@@ -79,7 +79,10 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-800 py-2">
+        <div
+          className="md:hidden bg-white dark:bg-gray-800 py-2"
+          onClick={() => setIsMenuOpen(false)}
+        >
           {!isLoading && renderNavLinks(true)}
           {!isLoading && renderAuthLinks(true)}
         </div>

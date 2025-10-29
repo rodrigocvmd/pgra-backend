@@ -112,7 +112,7 @@ export default function ManageBookingsPage() {
               </span>
             </div>
 
-            <div className="flex justify-end space-x-2">
+            <div className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-4 sm:mt-0">
               {booking.status === 'PENDENTE' && (
                 <button
                   onClick={() => handleActionClick(booking.id, 'CONFIRMADO')}
