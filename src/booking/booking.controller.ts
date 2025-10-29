@@ -33,8 +33,6 @@ export class BookingController {
     @Body() createBookingDto: CreateBookingDto,
     @Req() request: AuthRequest,
   ) {
-    console.log('DTO recebido no Controller:', createBookingDto);
-    console.log('Tipo de startTime:', typeof createBookingDto.startTime);
     return this.bookingService.create(createBookingDto, request.user.id);
   }
 
@@ -80,10 +78,7 @@ export class BookingController {
   @Patch(':id')
   @UseGuards(OwnerGuard)
   @Entity('reservation')
-  update(
-    @Param('id') id: string,
-    @Body() updateBookingDto: UpdateBookingDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
     return this.bookingService.update(id, updateBookingDto);
   }
 

@@ -273,6 +273,7 @@ export default function EditResourcePage() {
                   value={blockStartTime}
                   onChange={(e) => setBlockStartTime(e.target.value)}
                   className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  step="1800"
                 />
               </div>
               <div>
@@ -288,6 +289,7 @@ export default function EditResourcePage() {
                   value={blockEndTime}
                   onChange={(e) => setBlockEndTime(e.target.value)}
                   className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  step="1800"
                 />
               </div>
             </div>
@@ -331,8 +333,8 @@ export default function EditResourcePage() {
                       {block.reason}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {new Date(block.blockedStart).toLocaleString()} -{' '}
-                      {new Date(block.blockedEnd).toLocaleString()}
+                      {new Date(block.blockedStart).toLocaleDateString('pt-BR')} -{' '}
+                      {new Date(block.blockedEnd).toLocaleDateString('pt-BR')}
                     </p>
                   </div>
                   <button

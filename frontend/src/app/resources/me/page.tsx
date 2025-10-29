@@ -128,45 +128,48 @@ export default function MyResourcesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {resources.map((resource) => (
-            <Link href={`/resources/${resource.id}`} key={resource.id}>
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md h-full overflow-hidden hover:shadow-xl transition-shadow duration-200 cursor-pointer flex flex-col">
-                <div className="relative w-full h-48">
-                  <Image
-                    src={resource.imageUrl || '/placeholder.png'}
-                    alt={resource.name}
-                    layout="fill"
-                    objectFit="cover"
-                  />
-                </div>
-                <div className="p-6 flex-grow flex flex-col">
-                  <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
-                    {resource.name}
-                  </h2>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow">
-                    {resource.description || 'Sem descrição.'}
-                  </p>
-                  <p
-                    className="text-xl font-bold text-right mt-auto"
-                    style={{ color: getColorForPrice(resource.pricePerHour) }}
+            <div
+              key={resource.id}
+              onClick={() => router.push(`/resources/${resource.id}`)}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-md h-full overflow-hidden hover:shadow-xl transition-shadow duration-200 cursor-pointer flex flex-col"
+            >
+              <div className="relative w-full h-48">
+                <Image
+                  src={resource.imageUrl || '/placeholder.png'}
+                  alt={resource.name}
+                  layout="fill"
+                  objectFit="cover"
+                />
+              </div>
+              <div className="p-6 flex-grow flex flex-col">
+                <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
+                  {resource.name}
+                </h2>
+                <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow">
+                  {resource.description || 'Sem descrição.'}
+                </p>
+                <p
+                  className="text-xl font-bold text-right mt-auto"
+                  style={{ color: getColorForPrice(resource.pricePerHour) }}
+                >
+                  R${' '}
+                  {Number(resource.pricePerHour).toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{' '}
+                  / hora
+                </p>
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-2">
+                  <Link
+                    href={`/resources/me/edit/${resource.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
                   >
-                    R${' '}
-                    {Number(resource.pricePerHour).toLocaleString('pt-BR', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{' '}
-                    / hora
-                  </p>
-                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-2">
-                    <Link
-                      href={`/resources/me/edit/${resource.id}`}
-                      className="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
-                    >
-                      Editar
-                    </Link>
-                  </div>
+                    Editar
+                  </Link>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}
