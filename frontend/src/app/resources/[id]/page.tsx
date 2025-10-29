@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import CustomAlert from '@/components/CustomAlert';
 
 interface Resource {
   id: string;
@@ -71,11 +72,12 @@ export default function ResourceDetailPage() {
   };
 
   if (isLoading) return <div className="text-center p-8">Carregando recurso...</div>;
-  if (error) return <div className="text-center p-8 text-red-600">{error}</div>;
+  if (error) return <CustomAlert message={error} onClose={() => setError(null)} />;
   if (!resource) return null;
 
   return (
     <div className="container mx-auto p-8">
+      {bookingError && <CustomAlert message={bookingError} onClose={() => setBookingError(null)} />}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Coluna de Informações */}
         <div>
@@ -95,11 +97,10 @@ export default function ResourceDetailPage() {
                 Início da Reserva
               </label>
               <input
-                type="date"
+                type="datetime-local"
                 id="startTime"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                required
                 className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -108,15 +109,13 @@ export default function ResourceDetailPage() {
                 Fim da Reserva
               </label>
               <input
-                type="date"
+                type="datetime-local"
                 id="endTime"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                required
                 className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            {bookingError && <p className="text-sm text-red-600">{bookingError}</p>}
             <button
               type="submit"
               className="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import CustomAlert from '@/components/CustomAlert';
 
 export default function CreateResourcePage() {
   const [name, setName] = useState('');
@@ -20,6 +21,11 @@ export default function CreateResourcePage() {
 
     if (!user) {
       setError("Você precisa estar logado para criar um recurso.");
+      return;
+    }
+
+    if (!name || !pricePerHour) {
+      setError("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
 
@@ -47,6 +53,7 @@ export default function CreateResourcePage() {
 
   return (
     <div className="container mx-auto p-8">
+      {error && <CustomAlert message={error} onClose={() => setError(null)} />}
       <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
           Cadastre um Novo Recurso
@@ -59,7 +66,6 @@ export default function CreateResourcePage() {
             <input
               id="name"
               type="text"
-              required
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -100,14 +106,12 @@ export default function CreateResourcePage() {
               <input
                 id="pricePerHour"
                 type="number"
-                required
                 value={pricePerHour}
                 onChange={(e) => setPricePerHour(e.target.value)}
                 className="block w-full pl-10 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
           <div>
             <button
               type="submit"

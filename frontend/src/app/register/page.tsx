@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import CustomAlert from '@/components/CustomAlert';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -33,6 +34,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+      {error && <CustomAlert message={error} onClose={() => setError(null)} />}
       <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
           Crie sua conta
@@ -89,9 +91,6 @@ export default function RegisterPage() {
               className="block w-full px-3 py-2 mt-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          {error && (
-            <p className="text-sm text-red-500">{error}</p>
-          )}
           <div>
             <button
               type="submit"
