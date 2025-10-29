@@ -152,7 +152,7 @@ export default function MyBookingsPage() {
         <p className="text-gray-600 dark:text-gray-400">
           Você ainda não possui reservas. Faça uma:{' '}
           <Link href="/" className="text-blue-600 hover:underline">
-            Recursos Disponíveis
+            Locais e Recursos Disponíveis
           </Link>
         </p>
       ) : (
@@ -169,10 +169,20 @@ export default function MyBookingsPage() {
             <div className="mt-8">
               <button
                 onClick={() => setShowCancelled(!showCancelled)}
-                className="text-lg font-semibold text-blue-600 hover:underline mb-4"
+                className="w-full flex justify-between items-center px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 mb-4"
               >
-                {showCancelled ? 'Ocultar' : 'Mostrar'} Reservas Canceladas (
-                {cancelledBookings.length})
+                <span className="font-semibold">
+                  {showCancelled ? 'Ocultar' : 'Mostrar'} Reservas Canceladas ({cancelledBookings.length})
+                </span>
+                <svg
+                  className={`w-5 h-5 transform transition-transform ${showCancelled ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
               </button>
               {showCancelled && renderBookingList(cancelledBookings)}
             </div>

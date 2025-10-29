@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateResourceDto {
   @IsString()
@@ -13,6 +20,7 @@ export class CreateResourceDto {
   @IsOptional()
   imageUrl?: string;
 
+  @Type(() => Number)
   @IsNumber()
   @IsNotEmpty()
   pricePerHour: number;

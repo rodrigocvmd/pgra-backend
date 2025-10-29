@@ -10,10 +10,16 @@ export default function CreateResourcePage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [pricePerHour, setPricePerHour] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { user, login } = useAuth();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,21 +35,25 @@ export default function CreateResourcePage() {
       return;
     }
 
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('pricePerHour', pricePerHour);
+    if (imageFile) {
+      formData.append('file', imageFile);
+    }
+
     try {
-      const response = await api.post('/resource', {
-        name,
-        description,
-        imageUrl: imageUrl || null,
-        pricePerHour: parseFloat(pricePerHour),
+      const response = await api.post('/resource', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
       
-      // Se um novo token for retornado, atualize o estado de autenticação
       if (response.data.newAccessToken) {
         login(response.data.newAccessToken);
       }
 
-      console.log('Resource created:', response.data.resource);
-      // Redireciona para a nova página "Meus Recursos"
       router.push('/resources/me'); 
     } catch (err: any) {
       console.error('Failed to create resource:', err);
@@ -84,14 +94,14 @@ export default function CreateResourcePage() {
             />
           </div>
           <div>
-            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              URL da Imagem (Opcional)
+            <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Imagem do Recurso (Opcional)
             </label>
             <input
-              id="imageUrl"
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
+              id="image"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
               className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>

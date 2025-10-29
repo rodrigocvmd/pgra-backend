@@ -132,9 +132,9 @@ export default function Home() {
   };
 
   return (
-    <main className="container mx-auto p-8">
+    <main className="w-full p-8">
       <h1 className="text-4xl font-bold mb-8 text-center text-gray-900 dark:text-white">
-        Recursos Disponíveis
+        Locais Disponíveis
       </h1>
 
       <form
@@ -238,12 +238,12 @@ export default function Home() {
       </form>
 
       {isLoading ? (
-        <div className="text-center p-8">Carregando recursos...</div>
+        <div className="text-center p-8">Carregando locais...</div>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
       ) : resources.length === 0 ? (
         <p className="text-center text-gray-500 dark:text-gray-400">
-          Nenhum recurso encontrado com os filtros aplicados.
+          Nenhum local ou recurso encontrado com os filtros aplicados.
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

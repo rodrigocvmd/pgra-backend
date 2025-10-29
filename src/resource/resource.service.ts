@@ -16,7 +16,11 @@ export class ResourceService {
     private jwtService: JwtService,
   ) {}
 
-  async create(createResourceDto: CreateResourceDto, ownerId: string) {
+  async create(
+    createResourceDto: CreateResourceDto,
+    ownerId: string,
+    file?: any,
+  ) {
     return this.prismaService.$transaction(async (prisma) => {
       const user = await prisma.user.findUnique({
         where: { id: ownerId },
@@ -28,7 +32,6 @@ export class ResourceService {
 
       let newAccessToken: string | null = null;
 
-      // Se o usuário for um USER, promova-o a OWNER e gere um novo token.
       if (user.role === 'USER') {
         const updatedUser = await prisma.user.update({
           where: { id: ownerId },
@@ -43,12 +46,12 @@ export class ResourceService {
         newAccessToken = this.jwtService.sign(payload);
       }
 
-      // Crie o recurso.
       const resource = await prisma.resource.create({
         data: {
           name: createResourceDto.name,
           description: createResourceDto.description,
-          pricePerHour: createResourceDto.pricePerHour,
+          pricePerHour: parseFloat(createResourceDto.pricePerHour as any),
+          imageUrl: file ? `/uploads/${file.filename}` : null,
           owner: {
             connect: { id: ownerId },
           },

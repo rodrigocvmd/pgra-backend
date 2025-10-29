@@ -11,7 +11,10 @@ import {
   ValidationPipe,
   Req,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { ResourceService } from './resource.service';
 
@@ -37,144 +40,63 @@ import { UserRole } from '@prisma/client';
 
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-
-
-
-
 @ApiTags('resources')
-
 @Controller('resource')
-
 export class ResourceController {
-
   constructor(private readonly resourceService: ResourceService) {}
 
-
-
   @Post()
-
   @UseGuards(JwtAuthGuard, RolesGuard)
-
   @ApiBearerAuth()
-
   @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.USER)
-
   @ApiOperation({
-
     summary: 'Cria um novo recurso',
-
     description:
-
       'Se um usuário com a role USER criar um recurso, ele será promovido a OWNER.',
-
   })
-
+  @UseInterceptors(FileInterceptor('file'))
   @UsePipes(ValidationPipe)
-
   create(
-
     @Body() createResourceDto: CreateResourceDto,
-
     @Req() request: AuthRequest,
-
+    @UploadedFile() file: any,
   ) {
+    return this.resourceService.create(
+      createResourceDto,
+      request.user.id,
+      file,
+    );
+  }
 
-    return this.resourceService.create(createResourceDto, request.user.id);
-
+  @Get()
+  @ApiOperation({ summary: 'Lista todos os recursos (Público)' })
+  findAll(
+    @Query('availableFrom') availableFrom?: string,
+    @Query('availableTo') availableTo?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+  ) {
+    return this.resourceService.findAll({
+      availableFrom,
+      availableTo,
+      minPrice,
+      maxPrice,
+      sortBy,
+      sortOrder,
+    });
   }
 
 
 
-    @Get()
-
-
-
-    @ApiOperation({ summary: 'Lista todos os recursos (Público)' })
-
-
-
-    findAll(
-
-
-
-      @Query('availableFrom') availableFrom?: string,
-
-
-
-      @Query('availableTo') availableTo?: string,
-
-
-
-      @Query('minPrice') minPrice?: string,
-
-
-
-      @Query('maxPrice') maxPrice?: string,
-
-
-
-      @Query('sortBy') sortBy?: string,
-
-
-
-      @Query('sortOrder') sortOrder?: 'asc' | 'desc',
-
-
-
-    ) {
-
-
-
-      return this.resourceService.findAll({
-
-
-
-        availableFrom,
-
-
-
-        availableTo,
-
-
-
-        minPrice,
-
-
-
-        maxPrice,
-
-
-
-        sortBy,
-
-
-
-        sortOrder,
-
-
-
-      });
-
-
-
-    }
-
-
-
   @Get('me')
-
   @UseGuards(JwtAuthGuard, RolesGuard)
-
   @ApiBearerAuth()
-
-  @Roles(UserRole.ADMIN, UserRole.OWNER)
-
+  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.USER)
   @ApiOperation({ summary: 'Lista os recursos do usuário autenticado' })
-
   getMyResources(@Req() request: AuthRequest) {
-
     return this.resourceService.findMyResources(request.user.id);
-
   }
 
 

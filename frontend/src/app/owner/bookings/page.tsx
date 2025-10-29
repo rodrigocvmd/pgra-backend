@@ -86,25 +86,25 @@ export default function ManageBookingsPage() {
   const renderBookingList = (bookingList: Booking[]) => (
     <div className="space-y-4">
       {bookingList.map((booking) => (
-        <div key={booking.id} className="bg-white p-6 rounded-lg shadow-md">
+        <div key={booking.id} className="bg-gray-800 p-6 rounded-lg shadow-md">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
             <div>
-              <p className="font-bold text-lg">{booking.resource.name}</p>
-              <p className="text-sm text-gray-700">
+              <p className="font-bold text-gray-200 text-lg">{booking.resource.name}</p>
+              <p className="text-sm text-gray-300">
                 Reservado por: {booking.user.name || booking.user.email}
               </p>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-gray-300 mt-2">
                 De: {new Date(booking.startTime).toLocaleDateString('pt-BR')}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-300">
                 Até: {new Date(booking.endTime).toLocaleDateString('pt-BR')}
               </p>
             </div>
             
             <div className="text-center">
-              <span className={`px-3 py-1 text-sm rounded-full ${
+              <span className={`px-3 py-1 font-bold text-sm rounded-full ${
                 booking.status === 'CONFIRMADO' ? 'bg-green-200 text-green-800' :
-                booking.status === 'PENDENTE' ? 'bg-yellow-200 text-yellow-800' :
+                booking.status === 'PENDENTE' ? 'bg-yellow-200 text-yellow-700' :
                 booking.status === 'FINALIZADO' ? 'bg-blue-200 text-blue-800' :
                 'bg-red-200 text-red-800'
               }`}>
@@ -116,7 +116,7 @@ export default function ManageBookingsPage() {
               {booking.status === 'PENDENTE' && (
                 <button
                   onClick={() => handleActionClick(booking.id, 'CONFIRMADO')}
-                  className="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600"
+                  className="px-3 py-1 text-sm font-medium text-white bg-green-800 rounded-md hover:bg-green-600"
                 >
                   Confirmar
                 </button>
@@ -141,7 +141,7 @@ export default function ManageBookingsPage() {
       <h1 className="text-3xl font-bold mb-6">Gerenciar Reservas</h1>
       
       {activeBookings.length === 0 && cancelledBookings.length === 0 ? (
-        <p>Nenhuma reserva foi feita para seus recursos ainda.</p>
+        <p>Nenhuma reserva foi feita para seus locais ainda.</p>
       ) : (
         <>
           {activeBookings.length > 0 ? (
@@ -154,9 +154,20 @@ export default function ManageBookingsPage() {
             <div className="mt-8">
               <button
                 onClick={() => setShowCancelled(!showCancelled)}
-                className="text-lg font-semibold text-blue-600 hover:underline mb-4"
+                className="w-full flex justify-between items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 mb-4"
               >
-                {showCancelled ? 'Ocultar' : 'Mostrar'} Reservas Canceladas ({cancelledBookings.length})
+                <span className="font-semibold">
+                  {showCancelled ? 'Ocultar' : 'Mostrar'} Reservas Canceladas ({cancelledBookings.length})
+                </span>
+                <svg
+                  className={`w-5 h-5 transform transition-transform ${showCancelled ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
               </button>
               {showCancelled && renderBookingList(cancelledBookings)}
             </div>

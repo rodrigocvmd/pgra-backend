@@ -152,7 +152,7 @@ export default function EditResourcePage() {
   }
 
   return (
-    <div className="container mx-auto p-8 dark:bg-gray-900">
+    <div className="container mx-auto p-8">
       {error && <CustomAlert message={error} onClose={() => setError(null)} />}
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
@@ -357,10 +357,10 @@ export default function EditResourcePage() {
         </div>
 
         {/* Zona de Perigo */}
-        <div className="bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 p-6 rounded-lg">
+        <div className="p-6 rounded-lg">
           <button
             onClick={() => setIsDeleteModalOpen(true)}
-            className="w-full py-2 px-4 bg-red-600 text-white font-bold rounded-md hover:bg-red-700"
+            className="w-full py-2 px-4 text-red-100 border border-red-600 font-bold rounded-md bg-red-100 dark:bg-red-900 hover:bg-red-100 dark:hover:bg-red-800"
           >
             Deletar Permanentemente este Recurso
           </button>

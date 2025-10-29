@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import Header from "@/components/Header";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import "./globals.css";
+import type { Metadata } from 'next';
+import Header from '@/components/Header';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/components/ThemeProvider';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "Plataforma de Reservas",
-  description: "Reserve seus recursos de forma fácil",
+  title: 'PGRA - Plataforma de Gerenciamento e Reserva de Ativos',
+  description: 'Reserve seus locais de forma fácil',
 };
 
 export default function RootLayout({
@@ -16,15 +16,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-gray-50 dark:bg-gray-900">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-        >
+      <body className="min-h-screen">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <Header />
-            {children}
+            <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+              {children}
+            </main>
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -1,3 +1,4 @@
+import { UserRole } from '@prisma/client';
 import {
   ConflictException,
   Injectable,
@@ -32,7 +33,7 @@ export class AuthService {
         email: SignUpDto.email,
         name: SignUpDto.name,
         passwordHash: hashedPassword,
-        role: 'USER',
+        role: (SignUpDto.role as UserRole) || 'USER',
       },
     });
   }

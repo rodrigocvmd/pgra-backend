@@ -38,7 +38,7 @@ export default function MyResourcesPage() {
   useEffect(() => {
     if (isAuthLoading) return;
 
-    if (!user || (user.role !== 'OWNER' && user.role !== 'ADMIN')) {
+    if (!user) {
       router.push('/');
 
       return;
@@ -105,12 +105,14 @@ export default function MyResourcesPage() {
         <h1 className="text-3xl font-bold">Meus Recursos</h1>
 
         <div className="flex space-x-4">
-          <Link
-            href="/owner/bookings"
-            className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
-          >
-            Gerenciar Reservas dos seus Recursos
-          </Link>
+          {user && (user.role === 'OWNER' || user.role === 'ADMIN') && (
+            <Link
+              href="/owner/bookings"
+              className="bg-gray-500 text-white rounded-md hover:bg-gray-600 font-bold py-2 px-4 rounded"
+            >
+              Gerenciar Reservas dos seus Recursos
+            </Link>
+          )}
 
           <Link
             href="/resources/create"
