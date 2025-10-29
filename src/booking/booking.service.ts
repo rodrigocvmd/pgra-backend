@@ -123,6 +123,7 @@ export class BookingService {
           select: {
             id: true,
             name: true,
+            imageUrl: true,
           },
         },
       },

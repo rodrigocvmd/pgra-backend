@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ConfirmationModal from '@/components/ConfirmationModal';
 
+import Image from 'next/image';
+
 interface Reservation {
   id: string;
   startTime: string;
@@ -16,6 +18,7 @@ interface Reservation {
   resource: {
     id: string;
     name: string;
+    imageUrl: string | null;
   };
 }
 
@@ -89,54 +92,54 @@ export default function MyBookingsPage() {
       {bookingList.map((booking) => (
         <div
           key={booking.id}
-          className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"
+          className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex space-x-4 items-start"
         >
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="font-semibold text-lg text-gray-900 dark:text-white">
+          <Link href={`/resources/${booking.resource.id}`}>
+            <div className="flex-shrink-0 h-24 w-24 relative cursor-pointer">
+              <Image
+                src={booking.resource.imageUrl || '/placeholder.png'}
+                alt={booking.resource.name}
+                layout="fill"
+                objectFit="cover"
+                className="rounded-md"
+              />
+            </div>
+          </Link>
+          <div className="flex-grow">
+            <Link href={`/resources/${booking.resource.id}`}>
+              <p className="font-semibold text-lg text-gray-900 dark:text-white hover:underline cursor-pointer">
                 {booking.resource.name}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                De: {new Date(booking.startTime).toLocaleDateString('pt-BR')}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Até: {new Date(booking.endTime).toLocaleDateString('pt-BR')}
-              </p>
-            </div>
-            <div className="text-right space-y-2">
-              <p className="font-bold text-lg text-gray-600 dark:text-gray-100">
-                R${' '}
-                {Number(booking.totalPrice).toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
-              <span
-                className={`px-3 py-1 text-sm rounded-full ${
-                  booking.status === 'CONFIRMADO'
-                    ? 'bg-green-200 text-green-800 dark:bg-green-900 dark:text-gray-200'
-                    : booking.status === 'PENDENTE'
-                      ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-gray-200'
-                      : booking.status === 'FINALIZADO'
-                        ? 'bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-gray-200'
-                        : 'bg-red-200 text-red-800 dark:bg-red-900 dark:text-gray-200'
-                }`}
-              >
-                {booking.status}
-              </span>
-            </div>
+            </Link>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              De: {new Date(booking.startTime).toLocaleString('pt-BR')}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Até: {new Date(booking.endTime).toLocaleString('pt-BR')}
+            </p>
           </div>
-          {(booking.status === 'PENDENTE' ||
-            booking.status === 'CONFIRMADO') && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
-              <button
-                onClick={() => handleCancelClick(booking.id)}
-                className="px-3 py-1 text-sm font-medium text-gray-200 bg-orange-800 rounded-md hover:bg-red-600"
-              >
-                Cancelar Reserva
-              </button>
-            </div>
-          )}
+          <div className="text-right space-y-2 flex-shrink-0">
+            <p className="font-bold text-lg text-gray-600 dark:text-gray-100">
+              R${' '}
+              {Number(booking.totalPrice).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </p>
+            <span
+              className={`px-3 py-1 text-sm rounded-full ${
+                booking.status === 'CONFIRMADO'
+                  ? 'bg-green-200 text-green-800 dark:bg-green-900 dark:text-gray-200'
+                  : booking.status === 'PENDENTE'
+                  ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-gray-200'
+                  : booking.status === 'FINALIZADO'
+                  ? 'bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-gray-200'
+                  : 'bg-red-200 text-red-800 dark:bg-red-900 dark:text-gray-200'
+              }`}
+            >
+              {booking.status}
+            </span>
+          </div>
         </div>
       ))}
     </div>
