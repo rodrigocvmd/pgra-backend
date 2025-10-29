@@ -159,6 +159,7 @@ export class ResourceService {
   async update(
     resourceId: string,
     updateResourceDto: UpdateResourceDto,
+    file?: any,
   ) {
     const resource = await this.prismaService.resource.findUnique({
       where: { id: resourceId },
@@ -168,9 +169,19 @@ export class ResourceService {
       throw new NotFoundException('Recurso não encontrado.');
     }
 
+    const data: any = { ...updateResourceDto };
+
+    if (file) {
+      data.imageUrl = `/uploads/${file.filename}`;
+    }
+
+    if (updateResourceDto.pricePerHour) {
+      data.pricePerHour = parseFloat(updateResourceDto.pricePerHour as any);
+    }
+
     return this.prismaService.resource.update({
       where: { id: resourceId },
-      data: updateResourceDto,
+      data,
     });
   }
 

@@ -114,33 +114,21 @@ export class ResourceController {
 
 
   @Patch(':id')
-
   @UseGuards(JwtAuthGuard, OwnerGuard)
-
   @ApiBearerAuth()
-
   @Entity('resource')
-
   @ApiOperation({
-
     summary: 'Atualiza um recurso',
-
     description: 'Apenas o proprietário do recurso ou um ADMIN pode atualizá-lo.',
-
   })
-
+  @UseInterceptors(FileInterceptor('file'))
   @UsePipes(ValidationPipe)
-
   update(
-
     @Param('id') resourceId: string,
-
     @Body() updateResourceDto: UpdateResourceDto,
-
+    @UploadedFile() file: any,
   ) {
-
-    return this.resourceService.update(resourceId, updateResourceDto);
-
+    return this.resourceService.update(resourceId, updateResourceDto, file);
   }
 
 
