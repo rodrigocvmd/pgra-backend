@@ -180,7 +180,7 @@ export default function ManageBookingsPage() {
         message={`Tem certeza que deseja ${selectedBooking?.action === 'CONFIRMADO' ? 'confirmar' : 'cancelar'} esta reserva?`}
         onConfirm={confirmAction}
         onCancel={() => setIsModalOpen(false)}
-        confirmButtonText={selectedBooking?.action === 'CONFIRMADO' ? 'Sim, Confirmar' : 'Sim, Cancelar'}
+        confirmButtonText={selectedBooking?.action === 'CONFIRMADO' ? 'Sim, confirmar' : 'Sim, cancelar'}
       />
     </div>
   );
