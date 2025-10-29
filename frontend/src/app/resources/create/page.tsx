@@ -47,13 +47,13 @@ export default function CreateResourcePage() {
 
   return (
     <div className="container mx-auto p-8">
-      <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-6 text-gray-900">
+      <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
           Cadastre um Novo Recurso
         </h1>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Nome do Recurso
             </label>
             <input
@@ -62,11 +62,11 @@ export default function CreateResourcePage() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="block w-full px-3 py-2 mt-1 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Descrição
             </label>
             <textarea
@@ -74,11 +74,11 @@ export default function CreateResourcePage() {
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="block w-full px-3 py-2 mt-1 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
           <div>
-            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               URL da Imagem (Opcional)
             </label>
             <input
@@ -86,21 +86,26 @@ export default function CreateResourcePage() {
               type="url"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
-              className="block w-full px-3 py-2 mt-1 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
           <div>
-            <label htmlFor="pricePerHour" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="pricePerHour" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Preço por Hora (R$)
             </label>
-            <input
-              id="pricePerHour"
-              type="number"
-              required
-              value={pricePerHour}
-              onChange={(e) => setPricePerHour(e.target.value)}
-              className="block w-full px-3 py-2 mt-1 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
+            <div className="relative mt-1">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                R$
+              </span>
+              <input
+                id="pricePerHour"
+                type="number"
+                required
+                value={pricePerHour}
+                onChange={(e) => setPricePerHour(e.target.value)}
+                className="block w-full pl-10 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div>

@@ -160,7 +160,12 @@ export default function EditResourcePage() {
             </div>
             <div>
               <label htmlFor="pricePerHour" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Preço por Hora (R$)</label>
-              <input id="pricePerHour" type="number" required value={pricePerHour} onChange={(e) => setPricePerHour(e.target.value)} className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+              <div className="relative mt-1">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                  R$
+                </span>
+                <input id="pricePerHour" type="number" required value={pricePerHour} onChange={(e) => setPricePerHour(e.target.value)} className="block w-full pl-10 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+              </div>
             </div>
             <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700">Salvar Alterações</button>
           </form>

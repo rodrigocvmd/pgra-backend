@@ -198,4 +198,18 @@ export class ResourceService {
       },
     });
   }
+
+  async removeBlockedPeriod(blockedId: string) {
+    const blocked = await this.prismaService.blocked.findUnique({
+      where: { id: blockedId },
+    });
+
+    if (!blocked) {
+      throw new NotFoundException('Período bloqueado não encontrado.');
+    }
+
+    return this.prismaService.blocked.delete({
+      where: { id: blockedId },
+    });
+  }
 }

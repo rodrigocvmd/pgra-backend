@@ -97,10 +97,10 @@ export default function MyBookingsPage() {
                 {booking.resource.name}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                De: {new Date(booking.startTime).toLocaleString()}
+                De: {new Date(booking.startTime).toLocaleDateString('pt-BR')}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Até: {new Date(booking.endTime).toLocaleString()}
+                Até: {new Date(booking.endTime).toLocaleDateString('pt-BR')}
               </p>
             </div>
             <div className="text-right">

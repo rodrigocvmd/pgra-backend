@@ -39,12 +39,24 @@ export default function Home() {
     setError(null);
     try {
       const params = new URLSearchParams();
-      if (filters.availableFrom)
-        params.append('availableFrom', filters.availableFrom);
-      if (filters.availableTo)
-        params.append('availableTo', filters.availableTo);
-      if (filters.minPrice) params.append('minPrice', filters.minPrice);
-      if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
+      if (filters.availableFrom) {
+        const date = new Date(filters.availableFrom);
+        params.append('availableFrom', date.toISOString());
+      }
+      if (filters.availableTo) {
+        const date = new Date(filters.availableTo);
+        params.append('availableTo', date.toISOString());
+      }
+      if (filters.minPrice)
+        params.append(
+          'minPrice',
+          filters.minPrice.replace(/[^0-9,]/g, '').replace(',', '.'),
+        );
+      if (filters.maxPrice)
+        params.append(
+          'maxPrice',
+          filters.maxPrice.replace(/[^0-9,]/g, '').replace(',', '.'),
+        );
       if (sort.sortBy) params.append('sortBy', sort.sortBy);
       if (sort.sortOrder) params.append('sortOrder', sort.sortOrder);
 
@@ -66,7 +78,20 @@ export default function Home() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    if (name === 'minPrice' || name === 'maxPrice') {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      if (!numericValue) {
+        setFilters((prev) => ({ ...prev, [name]: '' }));
+        return;
+      }
+      const formattedValue = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      }).format(Number(numericValue) / 100);
+      setFilters((prev) => ({ ...prev, [name]: formattedValue }));
+    } else {
+      setFilters((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -124,7 +149,7 @@ export default function Home() {
             Disponível de
           </label>
           <input
-            type="datetime-local"
+            type="date"
             name="availableFrom"
             value={filters.availableFrom}
             onChange={handleFilterChange}
@@ -139,7 +164,7 @@ export default function Home() {
             Até
           </label>
           <input
-            type="datetime-local"
+            type="date"
             name="availableTo"
             value={filters.availableTo}
             onChange={handleFilterChange}
@@ -154,11 +179,12 @@ export default function Home() {
             Preço Mín.
           </label>
           <input
-            type="number"
+            type="text"
             name="minPrice"
             value={filters.minPrice}
             onChange={handleFilterChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="R$ 0,00"
           />
         </div>
         <div className="flex-1 min-w-[100px]">
@@ -169,11 +195,12 @@ export default function Home() {
             Preço Máx.
           </label>
           <input
-            type="number"
+            type="text"
             name="maxPrice"
             value={filters.maxPrice}
             onChange={handleFilterChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="R$ 1.000,00"
           />
         </div>
         <div className="flex-1 min-w-[150px]">

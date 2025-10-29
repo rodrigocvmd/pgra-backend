@@ -265,15 +265,19 @@ export class ResourceController {
 
   @UsePipes(ValidationPipe)
 
-  addBlockedPeriod(
+    addBlockedPeriod(
 
-    @Param('id') resourceId: string,
+      @Param('id') resourceId: string,
 
-    @Body() createBlockedDto: CreateBlockedDto,
+      @Body() createBlockedDto: CreateBlockedDto,
 
-  ) {
+    ) {
 
-    return this.resourceService.addBlockedPeriod(resourceId, createBlockedDto);
+      return this.resourceService.addBlockedPeriod(resourceId, createBlockedDto);
+
+    }
+
+  
 
     @Delete('block/:blockedId')
 

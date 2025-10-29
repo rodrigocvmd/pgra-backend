@@ -16,6 +16,11 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
 
+    if (!name || !email || !password) {
+      setError('Por favor, preencha todos os campos.');
+      return;
+    }
+
     try {
       await api.post('/auth/signup', { name, email, password });
       // Após o cadastro, redireciona para o login para que o usuário possa entrar
@@ -45,7 +50,6 @@ export default function RegisterPage() {
               name="name"
               type="text"
               autoComplete="name"
-              required
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="block w-full px-3 py-2 mt-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -63,7 +67,6 @@ export default function RegisterPage() {
               name="email"
               type="email"
               autoComplete="email"
-              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="block w-full px-3 py-2 mt-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -81,7 +84,6 @@ export default function RegisterPage() {
               name="password"
               type="password"
               autoComplete="new-password"
-              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="block w-full px-3 py-2 mt-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"

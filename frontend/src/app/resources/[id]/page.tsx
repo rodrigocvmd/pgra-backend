@@ -87,15 +87,15 @@ export default function ResourceDetailPage() {
         </div>
 
         {/* Coluna do Formulário de Reserva */}
-        <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="bg-blue-100 dark:bg-gray-800 p-8 rounded-lg shadow-md">
           <h2 className="text-2xl font-bold mb-6 text-center">Faça sua Reserva</h2>
           <form onSubmit={handleBookingSubmit} className="space-y-4">
             <div>
-              <label htmlFor="startTime" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="startTime" className="block text-sm font-medium text-gray-200">
                 Início da Reserva
               </label>
               <input
-                type="datetime-local"
+                type="date"
                 id="startTime"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
@@ -104,11 +104,11 @@ export default function ResourceDetailPage() {
               />
             </div>
             <div>
-              <label htmlFor="endTime" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="endTime" className="block text-sm font-medium text-gray-200">
                 Fim da Reserva
               </label>
               <input
-                type="datetime-local"
+                type="date"
                 id="endTime"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}

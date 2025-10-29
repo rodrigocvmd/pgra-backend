@@ -94,10 +94,10 @@ export default function ManageBookingsPage() {
                 Reservado por: {booking.user.name || booking.user.email}
               </p>
               <p className="text-sm text-gray-500 mt-2">
-                De: {new Date(booking.startTime).toLocaleString()}
+                De: {new Date(booking.startTime).toLocaleDateString('pt-BR')}
               </p>
               <p className="text-sm text-gray-500">
-                Até: {new Date(booking.endTime).toLocaleString()}
+                Até: {new Date(booking.endTime).toLocaleDateString('pt-BR')}
               </p>
             </div>
             
