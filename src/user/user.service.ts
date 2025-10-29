@@ -40,24 +40,41 @@ export class UserService {
     return newUser;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto, user: AuthUser) {
-    if (user.role !== UserRole.ADMIN && user.id !== id) {
-      throw new ForbiddenException(
-        'Você não tem permissão para atualizar este usuário.',
-      );
-    }
+      async update(id: string, updateUserDto: UpdateUserDto, user: AuthUser) {
 
-    const dataToUpdate: any = { ...updateUserDto };
+        if (user.role !== UserRole.ADMIN && user.id !== id) {
 
-    if (updateUserDto.password) {
-      dataToUpdate.passwordHash = await bcrypt.hash(updateUserDto.password, 10);
-      delete dataToUpdate.password;
-    }
-    return this.prismaService.user.update({
-      where: { id },
-      data: dataToUpdate,
-    });
-  }
+          throw new ForbiddenException(
+
+            'Você não tem permissão para atualizar este usuário.',
+
+          );
+
+        }
+
+    
+
+        const dataToUpdate: any = { ...updateUserDto };
+
+    
+
+        if (updateUserDto.password) {
+
+          dataToUpdate.passwordHash = await bcrypt.hash(updateUserDto.password, 10);
+
+          delete dataToUpdate.password;
+
+        }
+
+        return this.prismaService.user.update({
+
+          where: { id },
+
+          data: dataToUpdate,
+
+        });
+
+      }
 
   async promoteToOwner(id: string) {
     const user = await this.prismaService.user.findUnique({

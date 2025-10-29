@@ -1,27 +1,16 @@
 import {
-
   Controller,
-
   Get,
-
   Post,
-
   Body,
-
   Patch,
-
   Param,
-
   Delete,
-
   UseGuards,
-
   UsePipes,
-
   ValidationPipe,
-
   Req,
-
+  Query,
 } from '@nestjs/common';
 
 import { ResourceService } from './resource.service';
@@ -96,15 +85,79 @@ export class ResourceController {
 
 
 
-  @Get()
+    @Get()
 
-  @ApiOperation({ summary: 'Lista todos os recursos (Público)' })
 
-  findAll() {
 
-    return this.resourceService.findAll();
+    @ApiOperation({ summary: 'Lista todos os recursos (Público)' })
 
-  }
+
+
+    findAll(
+
+
+
+      @Query('availableFrom') availableFrom?: string,
+
+
+
+      @Query('availableTo') availableTo?: string,
+
+
+
+      @Query('minPrice') minPrice?: string,
+
+
+
+      @Query('maxPrice') maxPrice?: string,
+
+
+
+      @Query('sortBy') sortBy?: string,
+
+
+
+      @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+
+
+
+    ) {
+
+
+
+      return this.resourceService.findAll({
+
+
+
+        availableFrom,
+
+
+
+        availableTo,
+
+
+
+        minPrice,
+
+
+
+        maxPrice,
+
+
+
+        sortBy,
+
+
+
+        sortOrder,
+
+
+
+      });
+
+
+
+    }
 
 
 
@@ -222,6 +275,26 @@ export class ResourceController {
 
     return this.resourceService.addBlockedPeriod(resourceId, createBlockedDto);
 
-  }
+    @Delete('block/:blockedId')
 
-}
+    @UseGuards(JwtAuthGuard, OwnerGuard)
+
+    @ApiBearerAuth()
+
+    @Entity('blocked')
+
+    @ApiOperation({
+
+      summary: 'Remove um período de bloqueio',
+
+      description: 'Apenas o proprietário do recurso ou um ADMIN pode removê-lo.',
+
+    })
+
+    removeBlockedPeriod(@Param('blockedId') blockedId: string) {
+
+      return this.resourceService.removeBlockedPeriod(blockedId);
+
+    }
+
+  }

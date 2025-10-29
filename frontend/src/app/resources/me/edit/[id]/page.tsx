@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -28,7 +28,7 @@ export default function EditResourcePage() {
   const [description, setDescription] = useState('');
   const [pricePerHour, setPricePerHour] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  
+
   // State para o formulário de bloqueio
   const [blockStartTime, setBlockStartTime] = useState('');
   const [blockEndTime, setBlockEndTime] = useState('');
@@ -38,7 +38,7 @@ export default function EditResourcePage() {
   const [resource, setResource] = useState<Resource | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const router = useRouter();
   const params = useParams();
   const { id } = params;
@@ -55,7 +55,7 @@ export default function EditResourcePage() {
         setImageUrl(resData.imageUrl || '');
         setPricePerHour(String(resData.pricePerHour));
       } catch (err) {
-        setError("Não foi possível carregar o recurso.");
+        setError('Não foi possível carregar o recurso.');
       } finally {
         setIsLoading(false);
       }
@@ -75,7 +75,12 @@ export default function EditResourcePage() {
     e.preventDefault();
     setError(null);
     try {
-      await api.patch(`/resource/${id}`, { name, description, imageUrl: imageUrl || null, pricePerHour: parseFloat(pricePerHour) });
+      await api.patch(`/resource/${id}`, {
+        name,
+        description,
+        imageUrl: imageUrl || null,
+        pricePerHour: parseFloat(pricePerHour),
+      });
       router.push('/resources/me');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Falha ao atualizar o recurso.');
@@ -85,28 +90,43 @@ export default function EditResourcePage() {
   const handleBlockSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post(`/resource/${id}/block`, { 
-        blockedStart: new Date(blockStartTime).toISOString(), 
-        blockedEnd: new Date(blockEndTime).toISOString(), 
-        reason: blockReason 
+      await api.post(`/resource/${id}/block`, {
+        blockedStart: new Date(blockStartTime).toISOString(),
+        blockedEnd: new Date(blockEndTime).toISOString(),
+        reason: blockReason,
       });
       fetchResource();
       setBlockStartTime('');
       setBlockEndTime('');
       setBlockReason('');
-    } catch (err) { 
-      console.error("Failed to add block", err);
-      setError("Falha ao adicionar período de bloqueio.");
+    } catch (err) {
+      console.error('Failed to add block', err);
+      setError('Falha ao adicionar período de bloqueio.');
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Tem certeza que deseja deletar este recurso? Esta ação não pode ser desfeita.")) {
+    if (
+      window.confirm(
+        'Tem certeza que deseja deletar este recurso? Esta ação não pode ser desfeita.',
+      )
+    ) {
       try {
         await api.delete(`/resource/${id}`);
         router.push('/resources/me');
       } catch (err) {
-        setError("Falha ao deletar o recurso.");
+        setError('Falha ao deletar o recurso.');
+      }
+    }
+  };
+
+  const handleDeleteBlock = async (blockedId: string) => {
+    if (window.confirm("Tem certeza que deseja remover este bloqueio?")) {
+      try {
+        await api.delete(`/resource/block/${blockedId}`);
+        fetchResource(); // Recarrega os dados do recurso
+      } catch (err) {
+        setError("Falha ao remover o período de bloqueio.");
       }
     }
   };
@@ -120,41 +140,80 @@ export default function EditResourcePage() {
   }
 
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto p-8 dark:bg-gray-900">
       <div className="max-w-2xl mx-auto space-y-12">
         {/* Formulário de Edição Principal */}
-        <div className="bg-white p-8 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold mb-6">Editar Recurso</h1>
+        <div className="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg shadow-md">
+          <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Editar Recurso</h1>
           <form className="space-y-6" onSubmit={handleUpdateSubmit}>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nome do Recurso</label>
-              <input id="name" type="text" required value={name} onChange={(e) => setName(e.target.value)} className="block w-full mt-1 p-2 border rounded-md"/>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome do Recurso</label>
+              <input id="name" type="text" required value={name} onChange={(e) => setName(e.target.value)} className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
             </div>
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">Descrição</label>
-              <textarea id="description" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} className="block w-full mt-1 p-2 border rounded-md"/>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição</label>
+              <textarea id="description" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
             </div>
             <div>
-              <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">URL da Imagem</label>
-              <input id="imageUrl" type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="block w-full mt-1 p-2 border rounded-md"/>
+              <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300">URL da Imagem</label>
+              <input id="imageUrl" type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
             </div>
             <div>
-              <label htmlFor="pricePerHour" className="block text-sm font-medium text-gray-700">Preço por Hora (R$)</label>
-              <input id="pricePerHour" type="number" required value={pricePerHour} onChange={(e) => setPricePerHour(e.target.value)} className="block w-full mt-1 p-2 border rounded-md"/>
+              <label htmlFor="pricePerHour" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Preço por Hora (R$)</label>
+              <input id="pricePerHour" type="number" required value={pricePerHour} onChange={(e) => setPricePerHour(e.target.value)} className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
             </div>
             <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700">Salvar Alterações</button>
           </form>
         </div>
 
         {/* Gerenciamento de Bloqueios */}
-        <div className="bg-white p-8 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-6">Gerenciar Períodos Bloqueados</h2>
-          {/* ... (formulário de bloqueio) */}
+        <div className="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg shadow-md">
+          <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Gerenciar Períodos Bloqueados</h2>
+          
+          {/* Formulário para adicionar novo bloqueio */}
+          <form className="space-y-4 mb-8" onSubmit={handleBlockSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="blockStartTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Início do Bloqueio</label>
+                <input id="blockStartTime" type="datetime-local" required value={blockStartTime} onChange={(e) => setBlockStartTime(e.target.value)} className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+              </div>
+              <div>
+                <label htmlFor="blockEndTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fim do Bloqueio</label>
+                <input id="blockEndTime" type="datetime-local" required value={blockEndTime} onChange={(e) => setBlockEndTime(e.target.value)} className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+              </div>
+            </div>
+            <div>
+              <label htmlFor="blockReason" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Motivo</label>
+              <input id="blockReason" type="text" required value={blockReason} onChange={(e) => setBlockReason(e.target.value)} placeholder="Ex: Manutenção" className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"/>
+            </div>
+            <button type="submit" className="w-full py-2 px-4 bg-yellow-600 text-white rounded-md hover:bg-yellow-700">Adicionar Bloqueio</button>
+          </form>
+
+          {/* Lista de períodos bloqueados */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white border-t pt-4">Períodos Atuais</h3>
+            {resource?.Blocked && resource.Blocked.length > 0 ? (
+              resource.Blocked.map(block => (
+                <div key={block.id} className="flex justify-between items-center bg-gray-200 dark:bg-gray-700 p-3 rounded-md">
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">{block.reason}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {new Date(block.blockedStart).toLocaleString()} - {new Date(block.blockedEnd).toLocaleString()}
+                    </p>
+                  </div>
+                  <button onClick={() => handleDeleteBlock(block.id)} className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600">
+                    Remover
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400">Nenhum período bloqueado.</p>
+            )}
+          </div>
         </div>
 
         {/* Zona de Perigo */}
-        <div className="bg-red-50 border border-red-200 p-6 rounded-lg">
-          <h2 className="text-xl font-bold text-red-800 mb-4">Zona de Perigo</h2>
+        <div className="bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 p-6 rounded-lg">
           <button onClick={handleDelete} className="w-full py-2 px-4 bg-red-600 text-white font-bold rounded-md hover:bg-red-700">
             Deletar Permanentemente este Recurso
           </button>
@@ -162,4 +221,5 @@ export default function EditResourcePage() {
       </div>
     </div>
   );
+
 }

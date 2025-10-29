@@ -20,12 +20,13 @@ import { UserRole } from '@prisma/client';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import type { AuthRequest } from 'src/auth/types';
 
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(AuthGuard('jwt'))
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
+  @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   @UsePipes(ValidationPipe)
   create(@Body() createUserDto: CreateUserDto) {
@@ -33,18 +34,31 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
   }
 
+  @Patch('me')
+  @UsePipes(ValidationPipe)
+  updateMe(
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() request: AuthRequest,
+  ) {
+    return this.userService.update(request.user.id, updateUserDto, request.user);
+  }
+
   @Patch(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @UsePipes(ValidationPipe)
   update(
     @Param('id') id: string,
@@ -55,12 +69,14 @@ export class UserController {
   }
 
   @Patch(':id/promote-to-owner')
+  @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   promoteToOwner(@Param('id') id: string) {
     return this.userService.promoteToOwner(id);
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.userService.remove(id);

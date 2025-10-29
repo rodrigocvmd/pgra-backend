@@ -10,6 +10,7 @@ import {
   ValidationPipe,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
@@ -20,7 +21,7 @@ import { OwnerGuard } from 'src/auth/guards/owner/owner.guard';
 import { Entity } from 'src/auth/guards/owner/entity.decorator';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Roles } from 'src/auth/guards/roles/roles.decorator';
-import { UserRole } from '@prisma/client';
+import { UserRole, ReservationStatus } from '@prisma/client';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('booking')
@@ -51,8 +52,11 @@ export class BookingController {
 
   @Get('my-resources-bookings')
   @Roles(UserRole.ADMIN, UserRole.OWNER)
-  getBookingsForMyResources(@Req() request: AuthRequest) {
-    return this.bookingService.getBookingsForOwner(request.user.id);
+  getBookingsForMyResources(
+    @Req() request: AuthRequest,
+    @Query('status') status?: ReservationStatus,
+  ) {
+    return this.bookingService.getBookingsForOwner(request.user.id, status);
   }
 
   @Get(':id')

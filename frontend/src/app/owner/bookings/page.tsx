@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
 interface Booking {
   id: string;
@@ -25,6 +26,9 @@ export default function ManageBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCancelled, setShowCancelled] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<{ id: string; action: 'CONFIRMADO' | 'CANCELADO' } | null>(null);
   const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
 
@@ -49,15 +53,22 @@ export default function ManageBookingsPage() {
     fetchBookings();
   }, [user, isAuthLoading, router, fetchBookings]);
 
-  const handleUpdateStatus = async (bookingId: string, status: 'CONFIRMADO' | 'CANCELADO') => {
+  const handleActionClick = (id: string, action: 'CONFIRMADO' | 'CANCELADO') => {
+    setSelectedBooking({ id, action });
+    setIsModalOpen(true);
+  };
+
+  const confirmAction = async () => {
+    if (!selectedBooking) return;
     try {
-      const endpoint = status === 'CONFIRMADO' ? 'confirm' : 'cancel';
-      await api.patch(`/booking/${bookingId}/${endpoint}`);
-      // Atualiza a lista de reservas para refletir a mudança
+      const endpoint = selectedBooking.action === 'CONFIRMADO' ? 'confirm' : 'cancel';
+      await api.patch(`/booking/${selectedBooking.id}/${endpoint}`);
       fetchBookings();
     } catch (err) {
-      console.error(`Failed to ${status} booking:`, err);
-      // Opcional: mostrar um erro mais específico para o usuário
+      console.error(`Failed to ${selectedBooking.action} booking:`, err);
+    } finally {
+      setIsModalOpen(false);
+      setSelectedBooking(null);
     }
   };
 
@@ -69,65 +80,97 @@ export default function ManageBookingsPage() {
     return <div className="text-center p-8 text-red-600">{error}</div>;
   }
 
+  const activeBookings = bookings.filter(b => b.status !== 'CANCELADO');
+  const cancelledBookings = bookings.filter(b => b.status === 'CANCELADO');
+
+  const renderBookingList = (bookingList: Booking[]) => (
+    <div className="space-y-4">
+      {bookingList.map((booking) => (
+        <div key={booking.id} className="bg-white p-6 rounded-lg shadow-md">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div>
+              <p className="font-bold text-lg">{booking.resource.name}</p>
+              <p className="text-sm text-gray-700">
+                Reservado por: {booking.user.name || booking.user.email}
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                De: {new Date(booking.startTime).toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-500">
+                Até: {new Date(booking.endTime).toLocaleString()}
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <span className={`px-3 py-1 text-sm rounded-full ${
+                booking.status === 'CONFIRMADO' ? 'bg-green-200 text-green-800' :
+                booking.status === 'PENDENTE' ? 'bg-yellow-200 text-yellow-800' :
+                booking.status === 'FINALIZADO' ? 'bg-blue-200 text-blue-800' :
+                'bg-red-200 text-red-800'
+              }`}>
+                {booking.status}
+              </span>
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              {booking.status === 'PENDENTE' && (
+                <button
+                  onClick={() => handleActionClick(booking.id, 'CONFIRMADO')}
+                  className="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600"
+                >
+                  Confirmar
+                </button>
+              )}
+              {(booking.status === 'PENDENTE' || booking.status === 'CONFIRMADO') && (
+                <button
+                  onClick={() => handleActionClick(booking.id, 'CANCELADO')}
+                  className="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
+                >
+                  {booking.status === 'PENDENTE' ? 'Recusar' : 'Cancelar'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-6">Gerenciar Reservas</h1>
-      {bookings.length === 0 ? (
+      
+      {activeBookings.length === 0 && cancelledBookings.length === 0 ? (
         <p>Nenhuma reserva foi feita para seus recursos ainda.</p>
       ) : (
-        <div className="space-y-4">
-          {bookings.map((booking) => (
-            <div key={booking.id} className="bg-white p-6 rounded-lg shadow-md">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                {/* Coluna 1: Detalhes do Recurso e Datas */}
-                <div>
-                  <p className="font-bold text-lg">{booking.resource.name}</p>
-                  <p className="text-sm text-gray-700">
-                    Reservado por: {booking.user.name || booking.user.email}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    De: {new Date(booking.startTime).toLocaleString()}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Até: {new Date(booking.endTime).toLocaleString()}
-                  </p>
-                </div>
-                
-                {/* Coluna 2: Status */}
-                <div className="text-center">
-                  <span className={`px-3 py-1 text-sm rounded-full ${
-                    booking.status === 'CONFIRMADO' ? 'bg-green-200 text-green-800' :
-                    booking.status === 'PENDENTE' ? 'bg-yellow-200 text-yellow-800' :
-                    'bg-red-200 text-red-800'
-                  }`}>
-                    {booking.status}
-                  </span>
-                </div>
+        <>
+          {activeBookings.length > 0 ? (
+            renderBookingList(activeBookings)
+          ) : (
+            <p>Nenhuma reserva ativa encontrada.</p>
+          )}
 
-                {/* Coluna 3: Ações */}
-                <div className="flex justify-end space-x-2">
-                  {booking.status === 'PENDENTE' && (
-                    <button
-                      onClick={() => handleUpdateStatus(booking.id, 'CONFIRMADO')}
-                      className="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600"
-                    >
-                      Confirmar
-                    </button>
-                  )}
-                  {(booking.status === 'PENDENTE' || booking.status === 'CONFIRMADO') && (
-                    <button
-                      onClick={() => handleUpdateStatus(booking.id, 'CANCELADO')}
-                      className="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
-                    >
-                      {booking.status === 'PENDENTE' ? 'Recusar' : 'Cancelar'}
-                    </button>
-                  )}
-                </div>
-              </div>
+          {cancelledBookings.length > 0 && (
+            <div className="mt-8">
+              <button
+                onClick={() => setShowCancelled(!showCancelled)}
+                className="text-lg font-semibold text-blue-600 hover:underline mb-4"
+              >
+                {showCancelled ? 'Ocultar' : 'Mostrar'} Reservas Canceladas ({cancelledBookings.length})
+              </button>
+              {showCancelled && renderBookingList(cancelledBookings)}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        title={selectedBooking?.action === 'CONFIRMADO' ? 'Confirmar Reserva' : 'Confirmar Cancelamento'}
+        message={`Tem certeza que deseja ${selectedBooking?.action === 'CONFIRMADO' ? 'confirmar' : 'cancelar'} esta reserva?`}
+        onConfirm={confirmAction}
+        onCancel={() => setIsModalOpen(false)}
+        confirmButtonText={selectedBooking?.action === 'CONFIRMADO' ? 'Sim, Confirmar' : 'Sim, Cancelar'}
+      />
     </div>
   );
 }

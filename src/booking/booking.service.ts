@@ -30,6 +30,20 @@ export class BookingService {
     const startTime = new Date(createBookingDto.startTime);
     const endTime = new Date(createBookingDto.endTime);
 
+    // 1. Validação de data e duração
+    if (endTime <= startTime) {
+      throw new ForbiddenException(
+        'A data de término deve ser posterior à data de início.',
+      );
+    }
+
+    const durationInMillis = endTime.getTime() - startTime.getTime();
+    const minimumDurationInMillis = 60 * 60 * 1000; // 1 hora
+
+    if (durationInMillis < minimumDurationInMillis) {
+      throw new ForbiddenException('A duração mínima da reserva é de 1 hora.');
+    }
+
     const resource = await this.prismaService.resource.findUnique({
       where: {
         id: resourceId,
@@ -39,7 +53,7 @@ export class BookingService {
       throw new NotFoundException('Recurso não encontrado');
     }
 
-    // 1. Verificar períodos bloqueados
+    // 2. Verificar períodos bloqueados
     const blockedPeriod = await this.prismaService.blocked.findFirst({
       where: {
         resourceId,
@@ -115,13 +129,19 @@ export class BookingService {
     });
   }
 
-  async getBookingsForOwner(ownerId: string) {
-    return this.prismaService.reservation.findMany({
-      where: {
-        resource: {
-          ownerId,
-        },
+  async getBookingsForOwner(ownerId: string, status?: ReservationStatus) {
+    const where: any = {
+      resource: {
+        ownerId,
       },
+    };
+
+    if (status) {
+      where.status = status;
+    }
+
+    return this.prismaService.reservation.findMany({
+      where,
       include: {
         resource: {
           select: {
@@ -211,6 +231,20 @@ export class BookingService {
     // Converte as strings para Datas, se existirem
     const newStartTime = updateBookingDto.startTime ? new Date(updateBookingDto.startTime) : reservation.startTime;
     const newEndTime = updateBookingDto.endTime ? new Date(updateBookingDto.endTime) : reservation.endTime;
+
+    // Validação de data e duração
+    if (newEndTime <= newStartTime) {
+      throw new ForbiddenException(
+        'A data de término deve ser posterior à data de início.',
+      );
+    }
+
+    const durationInMillis = newEndTime.getTime() - newStartTime.getTime();
+    const minimumDurationInMillis = 60 * 60 * 1000; // 1 hora
+
+    if (durationInMillis < minimumDurationInMillis) {
+      throw new ForbiddenException('A duração mínima da reserva é de 1 hora.');
+    }
 
     const durationInHours =
       (newEndTime.getTime() - newStartTime.getTime()) / 3600000;

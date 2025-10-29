@@ -70,8 +70,70 @@ export class ResourceService {
     });
   }
 
-  findAll() {
+  findAll(filters?: {
+    availableFrom?: string;
+    availableTo?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) {
+    const {
+      availableFrom,
+      availableTo,
+      minPrice,
+      maxPrice,
+      sortBy,
+      sortOrder,
+    } = filters || {};
+
+    const where: any = {};
+
+    if (minPrice || maxPrice) {
+      where.pricePerHour = {};
+      if (minPrice) {
+        where.pricePerHour.gte = parseFloat(minPrice);
+      }
+      if (maxPrice) {
+        where.pricePerHour.lte = parseFloat(maxPrice);
+      }
+    }
+
+    if (availableFrom && availableTo) {
+      const from = new Date(availableFrom);
+      const to = new Date(availableTo);
+
+      where.bookings = {
+        none: {
+          OR: [
+            // Case 1: Booking starts within the range
+            {
+              startTime: { gte: from, lt: to },
+            },
+            // Case 2: Booking ends within the range
+            {
+              endTime: { gt: from, lte: to },
+            },
+            // Case 3: Booking envelops the range
+            {
+              startTime: { lte: from },
+              endTime: { gte: to },
+            },
+          ],
+        },
+      };
+    }
+
+    const orderBy =
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : undefined;
+
     return this.prismaService.resource.findMany({
+      where,
+      orderBy,
       include: {
         owner: {
           select: {
