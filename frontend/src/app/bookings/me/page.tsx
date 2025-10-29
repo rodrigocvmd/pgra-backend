@@ -103,8 +103,8 @@ export default function MyBookingsPage() {
                 Até: {new Date(booking.endTime).toLocaleDateString('pt-BR')}
               </p>
             </div>
-            <div className="text-right">
-              <p className="font-bold text-lg text-green-600 dark:text-green-400">
+            <div className="text-right space-y-2">
+              <p className="font-bold text-lg text-gray-600 dark:text-gray-100">
                 R${' '}
                 {Number(booking.totalPrice).toLocaleString('pt-BR', {
                   minimumFractionDigits: 2,
@@ -114,12 +114,12 @@ export default function MyBookingsPage() {
               <span
                 className={`px-3 py-1 text-sm rounded-full ${
                   booking.status === 'CONFIRMADO'
-                    ? 'bg-green-200 text-green-800 dark:bg-green-900 dark:text-green-200'
+                    ? 'bg-green-200 text-green-800 dark:bg-green-900 dark:text-gray-200'
                     : booking.status === 'PENDENTE'
-                      ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                      ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-gray-200'
                       : booking.status === 'FINALIZADO'
-                        ? 'bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                        : 'bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-200'
+                        ? 'bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-gray-200'
+                        : 'bg-red-200 text-red-800 dark:bg-red-900 dark:text-gray-200'
                 }`}
               >
                 {booking.status}
@@ -131,7 +131,7 @@ export default function MyBookingsPage() {
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
               <button
                 onClick={() => handleCancelClick(booking.id)}
-                className="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
+                className="px-3 py-1 text-sm font-medium text-gray-200 bg-orange-800 rounded-md hover:bg-red-600"
               >
                 Cancelar Reserva
               </button>

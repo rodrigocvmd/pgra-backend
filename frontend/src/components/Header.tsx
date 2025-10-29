@@ -11,16 +11,16 @@ const Header = () => {
   const renderNavLinks = (isMobile: boolean) => (
     <>
       {/* Links para todos os usuários logados */}
-      <Link href="/" className={`${isMobile ? 'block py-2 px-4' : ''} text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white`}>
+      <Link href="/" className={`${isMobile ? 'block py-2 px-4' : ''} text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white cursor-pointer`}>
         Reservar um Recurso
       </Link>
-      <Link href="/bookings/me" className={`${isMobile ? 'block py-2 px-4' : ''} text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white`}>
+      <Link href="/bookings/me" className={`${isMobile ? 'block py-2 px-4' : ''} text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white cursor-pointer`}>
         Minhas Reservas
       </Link>
 
       {/* Links para Meus Recursos */}
       {user && (
-        <Link href="/resources/me" className={`${isMobile ? 'block py-2 px-4' : ''} text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white`}>
+        <Link href="/resources/me" className={`${isMobile ? 'block py-2 px-4' : ''} text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white cursor-pointer`}>
           Meus Recursos
         </Link>
       )}
@@ -33,19 +33,19 @@ const Header = () => {
         <div className={`${isMobile ? 'border-t mt-2 pt-2' : 'border-l pl-4 ml-4'} border-gray-200 dark:border-gray-700 flex items-center ${isMobile ? '' : 'space-x-4'}`}>
           <span className={`${isMobile ? 'block py-2 px-4' : ''} text-gray-600 dark:text-gray-300`}>
             Bem-vindo(a),{' '}
-            <Link href="/profile/me" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500">
+            <Link href="/profile/me" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 cursor-pointer">
               {user.name || user.email}
             </Link>
           </span>
         </div>
       ) : (
         <>
-          <Link href="/login" className={`${isMobile ? 'block py-2 px-4' : ''} text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white`}>
+          <Link href="/login" className={`${isMobile ? 'block py-2 px-4' : ''} text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white cursor-pointer`}>
             Login
           </Link>
           <Link
             href="/register"
-            className={`${isMobile ? 'block py-2 px-4' : ''} px-4 py-1 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded`}
+            className={`${isMobile ? 'block py-2 px-4' : ''} px-4 py-1 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded cursor-pointer`}
           >
             Cadastre-se
           </Link>
@@ -57,7 +57,7 @@ const Header = () => {
   return (
     <header className="bg-white dark:bg-gray-800 shadow-md">
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold text-gray-800 dark:text-white">
+        <Link href="/" className="text-xl font-bold text-gray-800 dark:text-white cursor-pointer">
           Reserva de Locais e Recursos
         </Link>
 

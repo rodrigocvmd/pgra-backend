@@ -123,10 +123,10 @@ export default function Home() {
   const maxPrice = Math.max(...prices);
 
   const getColorForPrice = (price: number) => {
-    if (minPrice === maxPrice) return 'rgb(0, 255, 0)';
+    if (minPrice === maxPrice) return 'rgb(0, 40, 0)';
     const percentage = (price - minPrice) / (maxPrice - minPrice);
-    const red = 255 * percentage;
-    const green = 255;
+    const red = 220 * percentage;
+    const green = 160;
     const blue = 0;
     return `rgb(${red}, ${green}, ${blue})`;
   };
@@ -223,14 +223,14 @@ export default function Home() {
         <div className="flex items-end gap-2">
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 cursor-pointer"
           >
             Filtrar
           </button>
           <button
             type="button"
             onClick={handleClearFilters}
-            className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 cursor-pointer"
           >
             Limpar
           </button>

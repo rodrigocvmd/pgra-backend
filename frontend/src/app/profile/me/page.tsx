@@ -156,7 +156,7 @@ export default function MyProfilePage() {
             {success && <p className="text-sm text-green-600">{success}</p>}
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="w-full py-2 px-4 bg-blue-800 text-white rounded-md hover:bg-blue-700 cursor-pointer"
             >
               Salvar Alterações
             </button>
@@ -169,7 +169,7 @@ export default function MyProfilePage() {
               logout();
               router.push('/');
             }}
-            className="w-full py-2 px-4 bg-red-600 text-white font-bold rounded-md hover:bg-red-700"
+            className="w-full py-2 px-4 bg-red-800 text-white font-bold rounded-md hover:bg-red-700 cursor-pointer"
           >
             Logout
           </button>

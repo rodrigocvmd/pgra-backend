@@ -244,7 +244,7 @@ export default function EditResourcePage() {
             </div>
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
             >
               Salvar Alterações
             </button>
@@ -311,7 +311,7 @@ export default function EditResourcePage() {
             </div>
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
+              className="w-full py-2 px-4 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 cursor-pointer"
             >
               Adicionar Bloqueio
             </button>
@@ -342,7 +342,7 @@ export default function EditResourcePage() {
                       setSelectedBlockId(block.id);
                       setIsDeleteBlockModalOpen(true);
                     }}
-                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
+                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 cursor-pointer"
                   >
                     Remover
                   </button>
@@ -360,7 +360,7 @@ export default function EditResourcePage() {
         <div className="p-6 rounded-lg">
           <button
             onClick={() => setIsDeleteModalOpen(true)}
-            className="w-full py-2 px-4 text-red-100 border border-red-600 font-bold rounded-md bg-red-100 dark:bg-red-900 hover:bg-red-100 dark:hover:bg-red-800"
+            className="w-full py-2 px-4 bg-orange-700 text-orange-100 border border-red-600 font-bold rounded-md hover:bg-red-100 dark:hover:bg-red-800 cursor-pointer"
           >
             Deletar Permanentemente este Recurso
           </button>

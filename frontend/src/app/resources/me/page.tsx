@@ -71,21 +71,17 @@ export default function MyResourcesPage() {
 
   const getColorForPrice = (price: number) => {
     if (minPrice === maxPrice) {
-      return 'rgb(0, 255, 0)'; // Default to green if all prices are the same
+      return 'rgb(0, 150, 0)'; // Default to darker green if all prices are the same
     }
 
     const percentage = (price - minPrice) / (maxPrice - minPrice);
 
-    // Interpolate between yellow (expensive) and green (cheap)
-
+    // Interpolate between darker green (cheap) and yellow (expensive)
+    // Darker Green RGB: 0, 150, 0
     // Yellow RGB: 255, 255, 0
 
-    // Green RGB: 0, 255, 0
-
-    const red = 255 * percentage;
-
-    const green = 255;
-
+    const red = Math.round(255 * percentage);
+    const green = Math.round(150 + (105 * percentage)); // 255 - 150 = 105
     const blue = 0;
 
     return `rgb(${red}, ${green}, ${blue})`;
@@ -108,7 +104,7 @@ export default function MyResourcesPage() {
           {user && (user.role === 'OWNER' || user.role === 'ADMIN') && (
             <Link
               href="/owner/bookings"
-              className="bg-gray-500 text-white rounded-md hover:bg-gray-600 font-bold py-2 px-4 rounded"
+              className="bg-gray-500 text-white rounded-md hover:bg-gray-600 font-bold py-2 px-4 rounded cursor-pointer"
             >
               Gerenciar Reservas dos seus Recursos
             </Link>
@@ -116,7 +112,7 @@ export default function MyResourcesPage() {
 
           <Link
             href="/resources/create"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded cursor-pointer"
           >
             + Novo Recurso
           </Link>
@@ -165,7 +161,7 @@ export default function MyResourcesPage() {
                   <Link
                     href={`/resources/me/edit/${resource.id}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                    className="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 cursor-pointer"
                   >
                     Editar
                   </Link>
