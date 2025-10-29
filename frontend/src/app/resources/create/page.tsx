@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, DragEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,12 +12,31 @@ export default function CreateResourcePage() {
   const [pricePerHour, setPricePerHour] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const router = useRouter();
   const { user, login } = useAuth();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImageFile(e.target.files[0]);
+    }
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setImageFile(e.dataTransfer.files[0]);
     }
   };
 
@@ -97,7 +116,16 @@ export default function CreateResourcePage() {
             <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Imagem do Recurso (Opcional)
             </label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500">
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer ${
+                isDragging
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900'
+                  : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
+              }`}
+            >
               <div className="space-y-1 text-center">
                 <svg
                   className="mx-auto h-12 w-12 text-gray-400"
@@ -118,7 +146,7 @@ export default function CreateResourcePage() {
                     htmlFor="image"
                     className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
                   >
-                    <span>Carregar um arquivo</span>
+                    <span>Clique para carregar um arquivo</span>
                     <input
                       id="image"
                       name="image"
@@ -128,10 +156,9 @@ export default function CreateResourcePage() {
                       className="sr-only"
                     />
                   </label>
-                  <p className="pl-1">ou arraste e solte</p>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  PNG, JPG, GIF, WEBP de até 10MB
+                  PNG, JPG ou WEBP de até 10MB
                 </p>
               </div>
             </div>
