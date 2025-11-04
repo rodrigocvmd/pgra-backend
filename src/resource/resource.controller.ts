@@ -24,17 +24,17 @@ import { UpdateResourceDto } from './dto/update-resource.dto';
 
 import { CreateBlockedDto } from './dto/create-blocked.dto';
 
-import type { AuthRequest } from 'src/auth/types';
+import type { AuthRequest } from '../auth/types';
 
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-import { OwnerGuard } from 'src/auth/guards/owner/owner.guard';
+import { OwnerGuard } from '../auth/guards/owner/owner.guard';
 
-import { Entity } from 'src/auth/guards/owner/entity.decorator';
+import { Entity } from '../auth/guards/owner/entity.decorator';
 
-import { Roles } from 'src/auth/guards/roles/roles.decorator';
+import { Roles } from '../auth/guards/roles/roles.decorator';
 
-import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
+import { RolesGuard } from '../auth/guards/roles/roles.guard';
 
 import { UserRole } from '@prisma/client';
 
