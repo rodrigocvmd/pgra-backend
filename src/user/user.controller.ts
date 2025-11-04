@@ -15,10 +15,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Roles } from 'src/auth/guards/roles/roles.decorator';
+import { Roles } from '../auth/guards/roles/roles.decorator';
 import { UserRole } from '@prisma/client';
-import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
-import type { AuthRequest } from 'src/auth/types';
+import { RolesGuard } from '../auth/guards/roles/roles.guard';
+import type { AuthRequest } from '../auth/types';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('user')
