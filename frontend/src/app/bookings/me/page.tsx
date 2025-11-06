@@ -31,7 +31,7 @@ export default function MyBookingsPage() {
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
     null,
   );
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
 
   const fetchBookings = useCallback(async () => {
@@ -49,13 +49,12 @@ export default function MyBookingsPage() {
   }, [user]);
 
   useEffect(() => {
-    if (isAuthLoading) return;
     if (!user) {
       router.push('/login');
       return;
     }
     fetchBookings();
-  }, [user, isAuthLoading, router, fetchBookings]);
+  }, [user, router, fetchBookings]);
 
   const handleCancelClick = (bookingId: string) => {
     setSelectedBookingId(bookingId);
@@ -76,7 +75,7 @@ export default function MyBookingsPage() {
     }
   };
 
-  if (isLoading || isAuthLoading) {
+  if (isLoading) {
     return <div className="text-center p-8">Carregando reservas...</div>;
   }
 
