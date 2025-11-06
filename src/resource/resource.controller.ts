@@ -15,6 +15,8 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as path from 'path';
 
 import { ResourceService } from './resource.service';
 
@@ -54,7 +56,20 @@ export class ResourceController {
     description:
       'Se um usuário com a role USER criar um recurso, ele será promovido a OWNER.',
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}${path.extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
   @UsePipes(ValidationPipe)
   create(
     @Body() createResourceDto: CreateResourceDto,
@@ -121,7 +136,20 @@ export class ResourceController {
     summary: 'Atualiza um recurso',
     description: 'Apenas o proprietário do recurso ou um ADMIN pode atualizá-lo.',
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}${path.extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
   @UsePipes(ValidationPipe)
   update(
     @Param('id') resourceId: string,

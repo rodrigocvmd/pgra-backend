@@ -51,7 +51,10 @@ export class ResourceService {
           name: createResourceDto.name,
           description: createResourceDto.description,
           pricePerHour: parseFloat(createResourceDto.pricePerHour as any),
-          imageUrl: file ? `/uploads/${file.filename}` : null,
+          imageUrl:
+            file && process.env.BACKEND_URL
+              ? `${process.env.BACKEND_URL}/uploads/${file.filename}`
+              : null,
           owner: {
             connect: { id: ownerId },
           },
@@ -171,8 +174,8 @@ export class ResourceService {
 
     const data: any = { ...updateResourceDto };
 
-    if (file) {
-      data.imageUrl = `/uploads/${file.filename}`;
+    if (file && process.env.BACKEND_URL) {
+      data.imageUrl = `${process.env.BACKEND_URL}/uploads/${file.filename}`;
     }
 
     if (updateResourceDto.pricePerHour) {
