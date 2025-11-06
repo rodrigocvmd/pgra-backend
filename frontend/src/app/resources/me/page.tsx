@@ -31,13 +31,11 @@ export default function MyResourcesPage() {
 
   const [error, setError] = useState<string | null>(null);
 
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user } = useAuth();
 
   const router = useRouter();
 
   useEffect(() => {
-    if (isAuthLoading) return;
-
     if (!user) {
       router.push('/');
 
@@ -59,7 +57,7 @@ export default function MyResourcesPage() {
     };
 
     fetchResources();
-  }, [user, isAuthLoading, router]);
+  }, [user, router]);
 
   const prices = resources.map((r) => r.pricePerHour);
 
@@ -87,7 +85,7 @@ export default function MyResourcesPage() {
     return `rgb(${red}, ${green}, ${blue})`;
   };
 
-  if (isLoading || isAuthLoading) {
+  if (isLoading) {
     return <div className="text-center p-8">Carregando seus recursos...</div>;
   }
 

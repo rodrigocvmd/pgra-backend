@@ -50,7 +50,7 @@ export default function EditResourcePage() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user } = useAuth();
 
   const fetchResource = useCallback(async () => {
     if (id) {
@@ -77,13 +77,12 @@ export default function EditResourcePage() {
   }, [id]);
 
   useEffect(() => {
-    if (isAuthLoading) return;
     if (!user) {
       router.push('/login');
       return;
     }
     fetchResource();
-  }, [id, user, isAuthLoading, router, fetchResource]);
+  }, [id, user, router, fetchResource]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -215,7 +214,7 @@ export default function EditResourcePage() {
     }
   };
 
-  if (isLoading || isAuthLoading) {
+  if (isLoading) {
     return <div className="text-center p-8">Carregando...</div>;
   }
 
