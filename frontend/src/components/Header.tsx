@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 
 const Header = () => {
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const renderNavLinks = (isMobile: boolean) => (
@@ -106,8 +106,8 @@ const Header = () => {
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center space-x-8">
-          {!isLoading && renderNavLinks(false)}
-          {!isLoading && renderAuthLinks(false)}
+          {renderNavLinks(false)}
+          {renderAuthLinks(false)}
         </div>
       </nav>
 
@@ -117,8 +117,8 @@ const Header = () => {
           className="md:hidden bg-white dark:bg-gray-800 py-2"
           onClick={() => setIsMenuOpen(false)}
         >
-          {!isLoading && renderNavLinks(true)}
-          {!isLoading && renderAuthLinks(true)}
+          {renderNavLinks(true)}
+          {renderAuthLinks(true)}
         </div>
       )}
     </header>

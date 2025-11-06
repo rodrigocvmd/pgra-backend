@@ -7,7 +7,7 @@ import api from '@/lib/api';
 import { AxiosError } from 'axios';
 
 export default function MyProfilePage() {
-  const { user, logout, isLoading: isAuthLoading, login } = useAuth();
+  const { user, logout, login } = useAuth();
   const router = useRouter();
 
   const [name, setName] = useState('');
@@ -18,7 +18,6 @@ export default function MyProfilePage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isAuthLoading) return;
     if (!user) {
       router.push('/login');
     } else {
@@ -39,7 +38,7 @@ export default function MyProfilePage() {
       };
       fetchUserData();
     }
-  }, [user, isAuthLoading, router]);
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +79,7 @@ export default function MyProfilePage() {
     }
   };
 
-  if (isAuthLoading || !user) {
+  if (!user) {
     return <div className="text-center p-8">Carregando...</div>;
   }
 

@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { createContext, useState, useContext, ReactNode } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import api from '@/lib/api';
+import { setCookie, deleteCookie } from 'cookies-next';
 
 interface User {
   id: string;
@@ -17,50 +18,36 @@ interface AuthContextType {
   login: (token: string) => void;
   logout: () => void;
   updateUser: (user: User) => void;
-  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const { data } = await api.get('/users/me');
-        setUser(prevUser => ({
-          ...prevUser,
-          id: data.id,
-          email: data.email,
-          name: data.name,
-          role: data.role,
-        }));
-      } catch (error) {
-        console.error('Failed to fetch user profile', error);
-        logout();
-      }
-    };
-
-    const storedToken = localStorage.getItem('authToken');
-    if (storedToken) {
-      const decodedUser: User = jwtDecode(storedToken);
-      setUser(decodedUser);
-      setToken(storedToken);
-      api.defaults.headers.Authorization = `Bearer ${storedToken}`;
-      fetchUserProfile();
+export const AuthProvider = ({
+  children,
+  token: initialToken,
+}: {
+  children: ReactNode;
+  token: string | null;
+}) => {
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof initialToken === 'string') {
+      return jwtDecode(initialToken);
     }
-    setIsLoading(false);
-  }, []);
+    return null;
+  });
+  const [token, setToken] = useState<string | null>(initialToken);
+
+  if (initialToken) {
+    api.defaults.headers.Authorization = `Bearer ${initialToken}`;
+  }
 
   const login = async (newToken: string) => {
-    const decodedUser: User = jwtDecode(newToken);
-    localStorage.setItem('authToken', newToken);
-    setToken(newToken);
+    setCookie('authToken', newToken, {
+      maxAge: 30 * 24 * 60 * 60,
+      path: '/',
+    });
     api.defaults.headers.Authorization = `Bearer ${newToken}`;
-
+    const decodedUser: User = jwtDecode(newToken);
     try {
       const { data } = await api.get('/users/me');
       setUser({
@@ -72,13 +59,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error('Failed to fetch user profile after login', error);
       setUser(decodedUser);
     }
+    setToken(newToken);
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
+    deleteCookie('authToken');
+    delete api.defaults.headers.Authorization;
     setUser(null);
     setToken(null);
-    delete api.defaults.headers.Authorization;
   };
 
   const updateUser = (updatedUser: User) => {
@@ -86,9 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, token, login, logout, updateUser, isLoading }}
-    >
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

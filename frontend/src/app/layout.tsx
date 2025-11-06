@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Header from '@/components/Header';
-import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import './globals.css';
+import AuthTokenProvider from './AuthTokenProvider';
 
 export const metadata: Metadata = {
   title: 'PGRA - Plataforma de Gerenciamento e Reserva de Ativos',
@@ -18,12 +18,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AuthProvider>
+          <AuthTokenProvider>
             <Header />
             <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
               {children}
             </main>
-          </AuthProvider>
+          </AuthTokenProvider>
         </ThemeProvider>
       </body>
     </html>
