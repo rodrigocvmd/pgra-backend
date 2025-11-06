@@ -1,13 +1,15 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
+  images: {
+    remotePatterns: [
       {
-        source: '/uploads/:path*',
-        destination: 'http://localhost:3001/uploads/:path*',
+        protocol: 'https',
+        hostname: 'pgra-backend.onrender.com',
+        port: '',
+        pathname: '/uploads/**',
       },
-    ];
+    ],
   },
 };
 
