@@ -5,7 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { cookies } from 'next/headers';
 
 export default async function AuthTokenProvider({ children }: { children: React.ReactNode }) {
-  const authToken = await getCookie('authToken', { cookies });
+  const authToken = (await getCookie('authToken', { cookies })) || null;
 
   return <AuthProvider token={authToken}>{children}</AuthProvider>;
 }
