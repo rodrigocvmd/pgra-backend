@@ -50,7 +50,7 @@ const Header = () => {
               href="/profile/me"
               className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 cursor-pointer"
             >
-              {user.name || user.email}
+              {user.name}
             </Link>
             !
           </span>

@@ -64,11 +64,11 @@ export default function MyProfilePage() {
 
       const response = await api.patch('/user/me', payload);
 
-      // Se o email foi alterado, o token antigo pode ser invalidado.
-      // O ideal seria o backend retornar um novo token. Por enquanto, apenas mostramos sucesso.
-      setSuccess(
-        'Perfil atualizado com sucesso! Você verá as alterações no seu próximo login.',
-      );
+      // Atualiza o usuário no contexto
+      const { data: updatedUser } = await api.get('/auth/profile');
+      login(response.data.access_token);
+
+      setSuccess('Perfil atualizado com sucesso!');
       setPassword('');
       setConfirmPassword('');
     } catch (err: unknown) {

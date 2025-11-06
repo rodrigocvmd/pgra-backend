@@ -16,6 +16,7 @@ interface AuthContextType {
   token: string | null;
   login: (token: string) => void;
   logout: () => void;
+  updateUser: (user: User) => void;
   isLoading: boolean;
 }
 
@@ -27,23 +28,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Ao carregar a aplicação, verifica se há um token no localStorage
+    const fetchUserProfile = async () => {
+      try {
+        const { data } = await api.get('/users/me');
+        setUser(prevUser => ({
+          ...prevUser,
+          id: data.id,
+          email: data.email,
+          name: data.name,
+          role: data.role,
+        }));
+      } catch (error) {
+        console.error('Failed to fetch user profile', error);
+        logout();
+      }
+    };
+
     const storedToken = localStorage.getItem('authToken');
     if (storedToken) {
       const decodedUser: User = jwtDecode(storedToken);
       setUser(decodedUser);
       setToken(storedToken);
       api.defaults.headers.Authorization = `Bearer ${storedToken}`;
+      fetchUserProfile();
     }
     setIsLoading(false);
   }, []);
 
-  const login = (newToken: string) => {
+  const login = async (newToken: string) => {
     const decodedUser: User = jwtDecode(newToken);
     localStorage.setItem('authToken', newToken);
-    setUser(decodedUser);
     setToken(newToken);
     api.defaults.headers.Authorization = `Bearer ${newToken}`;
+
+    try {
+      const { data } = await api.get('/users/me');
+      setUser({
+        ...decodedUser,
+        name: data.name,
+        role: data.role,
+      });
+    } catch (error) {
+      console.error('Failed to fetch user profile after login', error);
+      setUser(decodedUser);
+    }
   };
 
   const logout = () => {
@@ -53,8 +81,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     delete api.defaults.headers.Authorization;
   };
 
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, token, login, logout, updateUser, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
