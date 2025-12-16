@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -153,6 +154,9 @@ export class ResourceService {
   }
 
   async findMyResources(ownerId: string) {
+    if (!ownerId) {
+      throw new BadRequestException('ID do proprietário é obrigatório.');
+    }
     return this.prismaService.resource.findMany({
       where: {
         ownerId,
