@@ -50,12 +50,16 @@ export default function EditResourcePage() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const fetchResource = useCallback(async () => {
     if (id) {
       try {
-        const response = await api.get(`/resource/${id}`);
+        const response = await api.get(`/resource/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const resData = response.data;
         setResource(resData);
         setName(resData.name);
@@ -74,7 +78,7 @@ export default function EditResourcePage() {
         setIsLoading(false);
       }
     }
-  }, [id]);
+  }, [id, token]);
 
   useEffect(() => {
     if (!user) {
@@ -133,6 +137,7 @@ export default function EditResourcePage() {
       await api.patch(`/resource/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
         },
       });
       router.push('/resources/me');
@@ -163,6 +168,10 @@ export default function EditResourcePage() {
         blockedStart: new Date(blockStartTime).toISOString(),
         blockedEnd: new Date(blockEndTime).toISOString(),
         reason: blockReason,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       fetchResource();
       setBlockStartTime('');
@@ -184,7 +193,11 @@ export default function EditResourcePage() {
   const handleDelete = async () => {
     setIsDeleteModalOpen(false);
     try {
-      await api.delete(`/resource/${id}`);
+      await api.delete(`/resource/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       router.push('/resources/me');
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
@@ -199,7 +212,11 @@ export default function EditResourcePage() {
     if (selectedBlockId) {
       setIsDeleteBlockModalOpen(false);
       try {
-        await api.delete(`/resource/block/${selectedBlockId}`);
+        await api.delete(`/resource/block/${selectedBlockId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         fetchResource(); // Recarrega os dados do recurso
       } catch (err: unknown) {
         if (err instanceof AxiosError) {

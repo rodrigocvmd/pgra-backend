@@ -76,7 +76,6 @@ export class ResourceController {
     @Req() request: AuthRequest,
     @UploadedFile() file: any,
   ) {
-    console.log('ResourceController.create - User:', request.user);
     return this.resourceService.create(
       createResourceDto,
       request.user.id,

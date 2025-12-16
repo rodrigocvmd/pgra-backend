@@ -31,7 +31,7 @@ export default function MyResourcesPage() {
 
   const [error, setError] = useState<string | null>(null);
 
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const router = useRouter();
 
@@ -44,7 +44,11 @@ export default function MyResourcesPage() {
 
     const fetchResources = async () => {
       try {
-        const response = await api.get('/resource/me');
+        const response = await api.get('/resource/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         setResources(response.data);
       } catch (err) {
@@ -57,7 +61,7 @@ export default function MyResourcesPage() {
     };
 
     fetchResources();
-  }, [user, router]);
+  }, [user, token, router]);
 
   const prices = resources.map((r) => r.pricePerHour);
 
