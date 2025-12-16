@@ -41,6 +41,7 @@ export class ResourceService {
         const payload = {
           sub: updatedUser.id,
           email: updatedUser.email,
+          name: updatedUser.name,
           role: updatedUser.role,
         };
         newAccessToken = this.jwtService.sign(payload);
