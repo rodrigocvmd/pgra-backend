@@ -5,17 +5,21 @@ import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
-    super({
-      datasources: {
-        db: {
-          url: process.env.DATABASE_URL
-            ? process.env.DATABASE_URL.includes('?')
-              ? `${process.env.DATABASE_URL}&pgbouncer=true`
-              : `${process.env.DATABASE_URL}?pgbouncer=true`
-            : undefined,
-        },
-      },
-    });
+    const url = process.env.DATABASE_URL;
+
+    super(
+      url
+        ? {
+            datasources: {
+              db: {
+                url: url.includes('?')
+                  ? `${url}&pgbouncer=true`
+                  : `${url}?pgbouncer=true`,
+              },
+            },
+          }
+        : undefined,
+    );
   }
 
   async onModuleInit() {

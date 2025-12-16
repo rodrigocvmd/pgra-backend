@@ -38,29 +38,34 @@ export class AuthService {
   }
 
   async signIn(SignInDto: SignInDto) {
-    const loginEncontrado = await this.prismaService.user.findUnique({
-      where: {
-        email: SignInDto.email,
-      },
-    });
-    if (!loginEncontrado) {
-      throw new UnauthorizedException('Usuário ou senha incorretos');
-    }
-    const passwordCheck = await bcrypt.compare(
-      SignInDto.password,
-      loginEncontrado.passwordHash,
-    );
-    if (!passwordCheck) {
-      throw new UnauthorizedException('Usuário ou senha incorretos');
-    }
-    const payload = {
-      sub: loginEncontrado.id,
-      email: loginEncontrado.email,
-      name: loginEncontrado.name,
-      role: loginEncontrado.role,
-    };
-    const accessToken = this.jwtService.sign(payload);
+    try {
+      const loginEncontrado = await this.prismaService.user.findUnique({
+        where: {
+          email: SignInDto.email,
+        },
+      });
+      if (!loginEncontrado) {
+        throw new UnauthorizedException('Usuário ou senha incorretos');
+      }
+      const passwordCheck = await bcrypt.compare(
+        SignInDto.password,
+        loginEncontrado.passwordHash,
+      );
+      if (!passwordCheck) {
+        throw new UnauthorizedException('Usuário ou senha incorretos');
+      }
+      const payload = {
+        sub: loginEncontrado.id,
+        email: loginEncontrado.email,
+        name: loginEncontrado.name,
+        role: loginEncontrado.role,
+      };
+      const accessToken = this.jwtService.sign(payload);
 
-    return { access_token: accessToken };
+      return { access_token: accessToken };
+    } catch (error) {
+      console.error('Error during signIn:', error);
+      throw error;
+    }
   }
 }
