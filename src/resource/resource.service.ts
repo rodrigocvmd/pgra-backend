@@ -23,11 +23,13 @@ export class ResourceService {
     file?: any,
   ) {
     return this.prismaService.$transaction(async (prisma) => {
+      console.log('ResourceService.create - Searching for ownerId:', ownerId);
       const user = await prisma.user.findUnique({
         where: { id: ownerId },
       });
 
       if (!user) {
+        console.error(`User with ID ${ownerId} not found in database.`);
         throw new NotFoundException('Usuário não encontrado.');
       }
 
