@@ -71,6 +71,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     getResources();
   }, []); // Fetch on initial load
 

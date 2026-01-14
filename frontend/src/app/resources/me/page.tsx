@@ -37,6 +37,10 @@ export default function MyResourcesPage() {
   const router = useRouter();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if (!user) {
       router.push('/');
 

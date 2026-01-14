@@ -34,6 +34,10 @@ export default function MyBookingsPage() {
   const { user } = useAuth();
   const router = useRouter();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const fetchBookings = useCallback(async () => {
     if (!user) return;
     try {
