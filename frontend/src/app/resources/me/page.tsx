@@ -91,18 +91,18 @@ export default function MyResourcesPage() {
 
   const maxPrice = Math.max(...prices);
 
-  // Function to get color based on price
+  // Função para obter cor baseada no preço
 
   const getColorForPrice = (price: number) => {
     if (minPrice === maxPrice) {
-      return 'rgb(0, 150, 0)'; // Default to darker green if all prices are the same
+      return 'rgb(0, 150, 0)'; // Padrão para verde escuro se todos os preços forem iguais
     }
 
     const percentage = (price - minPrice) / (maxPrice - minPrice);
 
-    // Interpolate between darker green (cheap) and yellow (expensive)
-    // Darker Green RGB: 0, 150, 0
-    // Yellow RGB: 255, 255, 0
+    // Interpolar entre verde escuro (barato) e amarelo (caro)
+    // Verde escuro RGB: 0, 150, 0
+    // Amarelo RGB: 255, 255, 0
 
     const red = Math.round(255 * percentage);
     const green = Math.round(150 + (105 * percentage)); // 255 - 150 = 105

@@ -73,7 +73,7 @@ export default function Home() {
   useEffect(() => {
     window.scrollTo(0, 0);
     getResources();
-  }, []); // Fetch on initial load
+  }, []); // Buscar no carregamento inicial
 
   const handleFilterChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -118,7 +118,7 @@ export default function Home() {
     setTimeout(getResources, 0);
   };
 
-  // Find min and max prices for color gradient
+  // Encontrar preços mínimo e máximo para o gradiente de cor
   const prices = resources.map((r) => r.pricePerHour);
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);

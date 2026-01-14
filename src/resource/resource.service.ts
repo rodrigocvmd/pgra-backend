@@ -115,15 +115,15 @@ export class ResourceService {
       where.bookings = {
         none: {
           OR: [
-            // Case 1: Booking starts within the range
+            // Caso 1: A reserva inicia dentro do intervalo
             {
               startTime: { gte: from, lt: to },
             },
-            // Case 2: Booking ends within the range
+            // Caso 2: A reserva termina dentro do intervalo
             {
               endTime: { gt: from, lte: to },
             },
-            // Case 3: Booking envelops the range
+            // Caso 3: A reserva engloba o intervalo
             {
               startTime: { lte: from },
               endTime: { gte: to },

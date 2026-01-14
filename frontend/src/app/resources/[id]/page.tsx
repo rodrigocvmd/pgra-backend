@@ -64,12 +64,12 @@ export default function ResourceDetailPage() {
       } else if (end <= start) {
         setValidationError("A data de fim deve ser posterior à data de início.");
       } else {
-        // Calculate Price
+        // Calcular Preço
         const durationHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
         const calculatedPrice = durationHours * resource.pricePerHour;
         setTotalPrice(calculatedPrice);
 
-        // Check for Overlaps
+        // Verificar Sobreposições
         const hasReservationOverlap = resource.reservations.some(res => {
             if (res.status === 'CANCELADO') return false;
             const resStart = new Date(res.startTime);

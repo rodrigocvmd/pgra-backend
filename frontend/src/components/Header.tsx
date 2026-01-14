@@ -84,7 +84,7 @@ const Header = () => {
           Reserva de Locais e Recursos
         </Link>
 
-        {/* Hamburger Button */}
+        {/* Botão Hamburger */}
         <div className="md:hidden">
           <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
             <svg
@@ -104,14 +104,14 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Desktop Links */}
+        {/* Links para Desktop */}
         <div className="hidden md:flex items-center space-x-8">
           {renderNavLinks(false)}
           {renderAuthLinks(false)}
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Menu Mobile */}
       {isMenuOpen && (
         <div
           className="md:hidden bg-white dark:bg-gray-800 py-2"
