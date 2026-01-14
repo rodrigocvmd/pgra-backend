@@ -179,7 +179,9 @@ export default function ManageBookingsPage() {
         message={`Tem certeza que deseja ${selectedBooking?.action === 'CONFIRMADO' ? 'confirmar' : 'cancelar'} esta reserva?`}
         onConfirm={confirmAction}
         onCancel={() => setIsModalOpen(false)}
-        confirmButtonText={selectedBooking?.action === 'CONFIRMADO' ? 'Sim, confirmar' : 'Sim, cancelar'}
+        variant={selectedBooking?.action === 'CONFIRMADO' ? 'success' : 'danger'}
+        confirmButtonText={selectedBooking?.action === 'CONFIRMADO' ? 'Sim, confirmar esta reserva' : 'Sim, cancelar esta reserva'}
+        cancelButtonText={selectedBooking?.action === 'CONFIRMADO' ? 'Não confirmar a reserva' : 'Não, manter reserva'}
       />
     </div>
   );

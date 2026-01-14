@@ -77,6 +77,9 @@ export class BookingService {
     const conflictingBooking = await this.prismaService.reservation.findFirst({
       where: {
         resourceId: resourceId,
+        NOT: {
+          status: ReservationStatus.CANCELADO,
+        },
         AND: [
           { endTime: { gt: startTime } },
           { startTime: { lt: endTime } },
@@ -254,6 +257,10 @@ export class BookingService {
     const conflictingBooking = await this.prismaService.reservation.findFirst({
       where: {
         resourceId: reservation.resourceId,
+
+        status: {
+          not: ReservationStatus.CANCELADO,
+        },
 
         NOT: {
           id: reservationId,

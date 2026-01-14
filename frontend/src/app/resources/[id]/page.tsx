@@ -14,6 +14,8 @@ interface Resource {
   description: string | null;
   imageUrl: string | null;
   pricePerHour: number;
+  reservations: { startTime: string; endTime: string; status: string }[];
+  Blocked: { blockedStart: string; blockedEnd: string; reason: string }[];
 }
 
 export default function ResourceDetailPage() {
@@ -24,6 +26,7 @@ export default function ResourceDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   
   const params = useParams();
   const { id } = params;
@@ -48,24 +51,53 @@ export default function ResourceDetailPage() {
   }, [id]);
 
   useEffect(() => {
+    setValidationError(null);
+    setTotalPrice(null);
+
     if (startTime && endTime && resource) {
       const start = new Date(startTime);
       const end = new Date(endTime);
-      if (end > start) {
+      const now = new Date();
+
+      if (start < now) {
+        setValidationError("A data de início deve ser no futuro.");
+      } else if (end <= start) {
+        setValidationError("A data de fim deve ser posterior à data de início.");
+      } else {
+        // Calculate Price
         const durationHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
         const calculatedPrice = durationHours * resource.pricePerHour;
         setTotalPrice(calculatedPrice);
-      } else {
-        setTotalPrice(null);
+
+        // Check for Overlaps
+        const hasReservationOverlap = resource.reservations.some(res => {
+            if (res.status === 'CANCELADO') return false;
+            const resStart = new Date(res.startTime);
+            const resEnd = new Date(res.endTime);
+            return start < resEnd && end > resStart;
+        });
+        
+        if (hasReservationOverlap) {
+            setValidationError("Já existe uma reserva neste período.");
+        } else {
+            const hasBlockedOverlap = resource.Blocked.some(blocked => {
+                 const blockStart = new Date(blocked.blockedStart);
+                 const blockEnd = new Date(blocked.blockedEnd);
+                 return start < blockEnd && end > blockStart;
+            });
+             if (hasBlockedOverlap) {
+                setValidationError("Este período está bloqueado pelo proprietário.");
+            }
+        }
       }
-    } else {
-      setTotalPrice(null);
     }
   }, [startTime, endTime, resource]);
 
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBookingError(null);
+
+    if (validationError) return;
 
     if (!user) {
       router.push('/login');
@@ -121,7 +153,7 @@ export default function ResourceDetailPage() {
           <h2 className="text-2xl font-bold mb-6 text-center">Faça sua Reserva</h2>
           <form onSubmit={handleBookingSubmit} className="space-y-4">
             <div>
-              <label htmlFor="startTime" className="block text-sm font-medium text-gray-200">
+              <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Início da Reserva
               </label>
               <input
@@ -129,12 +161,12 @@ export default function ResourceDetailPage() {
                 id="startTime"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 step="1800"
               />
             </div>
             <div>
-              <label htmlFor="endTime" className="block text-sm font-medium text-gray-200">
+              <label htmlFor="endTime" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Fim da Reserva
               </label>
               <input
@@ -142,21 +174,32 @@ export default function ResourceDetailPage() {
                 id="endTime"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 step="1800"
               />
             </div>
-            {totalPrice !== null && (
+            {totalPrice !== null && !validationError && (
               <div className="text-center text-xl font-bold py-2">
                 <p>Valor Total: R$ {totalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
             )}
+            
             <button
               type="submit"
-              className="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={!!validationError || !startTime || !endTime}
+              className={`w-full px-4 py-2 font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                !!validationError || !startTime || !endTime
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
             >
               Reservar Agora
             </button>
+            {validationError && (
+                <p className="text-red-500 text-sm mt-2 text-center font-medium">
+                    {validationError}
+                </p>
+            )}
           </form>
         </div>
       </div>

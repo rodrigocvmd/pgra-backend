@@ -30,6 +30,7 @@ export default function MyResourcesPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [error, setError] = useState<string | null>(null);
+  const [hasPendingBookings, setHasPendingBookings] = useState(false);
 
   const { user, token } = useAuth();
 
@@ -60,7 +61,24 @@ export default function MyResourcesPage() {
       }
     };
 
+    const fetchPendingBookings = async () => {
+        if (user.role !== 'OWNER' && user.role !== 'ADMIN') return;
+        try {
+            const response = await api.get('/booking/my-resources-bookings?status=PENDENTE', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (response.data && response.data.length > 0) {
+                setHasPendingBookings(true);
+            }
+        } catch (err) {
+            console.error('Failed to fetch pending bookings', err);
+        }
+    }
+
     fetchResources();
+    fetchPendingBookings();
   }, [user, token, router]);
 
   const prices = resources.map((r) => r.pricePerHour);
@@ -104,12 +122,20 @@ export default function MyResourcesPage() {
 
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           {user && (user.role === 'OWNER' || user.role === 'ADMIN') && (
-            <Link
-              href="/owner/bookings"
-              className="bg-gray-500 text-white rounded-md hover:bg-gray-600 font-bold py-2 px-4 rounded cursor-pointer text-center"
-            >
-              Gerenciar Reservas dos seus Recursos
-            </Link>
+            <div className="relative">
+              <Link
+                href="/owner/bookings"
+                className="bg-gray-500 text-white rounded-md hover:bg-gray-600 font-bold py-2 px-4 rounded cursor-pointer text-center block"
+              >
+                Gerenciar Reservas dos seus Recursos
+              </Link>
+              {hasPendingBookings && (
+                <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+              )}
+            </div>
           )}
 
           <Link

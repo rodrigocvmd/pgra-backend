@@ -74,6 +74,7 @@ export class ResourceService {
       },
       include: {
         Blocked: true, // O nome do modelo no Prisma é 'Blocked' com 'B' maiúsculo
+        reservations: true,
       },
     });
   }

@@ -210,7 +210,8 @@ export default function MyBookingsPage() {
         message="Tem certeza que deseja cancelar esta reserva? Esta ação não pode ser desfeita."
         onConfirm={confirmCancel}
         onCancel={() => setIsModalOpen(false)}
-        confirmButtonText="Sim, Cancelar"
+        confirmButtonText="Sim, cancelar esta reserva"
+        cancelButtonText="Não, manter reserva"
       />
     </div>
   );
