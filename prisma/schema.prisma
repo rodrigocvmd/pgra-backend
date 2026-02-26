@@ -39,19 +39,19 @@ model User {
 }
 
 model Resource {
-  id             String          @id @default(uuid())
-  name           String
-  description    String?
-  imageUrl       String?
-  owner          User            @relation(fields: [ownerId], references: [id])
-  ownerId        String
-  pricePerHour   Decimal
+  id           String        @id @default(uuid())
+  name         String
+  description  String?
+  imageUrl     String?
+  owner        User          @relation(fields: [ownerId], references: [id])
+  ownerId      String
+  pricePerHour Decimal
   // availabilities Availability[]
-  reservations   Reservation[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  Comment        Comment[]
-  Blocked        Blocked[]
+  reservations Reservation[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Comment      Comment[]
+  Blocked      Blocked[]
 }
 
 model Blocked {
