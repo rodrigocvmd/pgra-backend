@@ -15,6 +15,7 @@ export default function CreateResourcePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { user, login } = useAuth();
 
@@ -60,6 +61,7 @@ export default function CreateResourcePage() {
       return;
     }
 
+    setIsSubmitting(true);
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
@@ -87,6 +89,7 @@ export default function CreateResourcePage() {
       } else {
         setError('Falha ao criar o recurso.');
       }
+      setIsSubmitting(false);
     }
   };
 
@@ -106,8 +109,9 @@ export default function CreateResourcePage() {
               id="name"
               type="text"
               value={name}
+              disabled={isSubmitting}
               onChange={(e) => setName(e.target.value)}
-              className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
             />
           </div>
           <div>
@@ -118,8 +122,9 @@ export default function CreateResourcePage() {
               id="description"
               rows={4}
               value={description}
+              disabled={isSubmitting}
               onChange={(e) => setDescription(e.target.value)}
-              className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
             />
           </div>
           <div>
@@ -135,7 +140,7 @@ export default function CreateResourcePage() {
                 />
                 <label
                   htmlFor="image"
-                  className="cursor-pointer mt-2 inline-block text-sm font-medium text-blue-600 hover:text-blue-500"
+                  className={`mt-2 inline-block text-sm font-medium text-blue-600 hover:text-blue-500 ${isSubmitting ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                 >
                   Trocar imagem
                   <input
@@ -143,6 +148,7 @@ export default function CreateResourcePage() {
                     name="image"
                     type="file"
                     accept="image/*"
+                    disabled={isSubmitting}
                     onChange={handleFileChange}
                     className="sr-only"
                   />
@@ -153,11 +159,11 @@ export default function CreateResourcePage() {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer ${
+                className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md ${
                   isDragging
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900'
                     : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
-                }`}
+                } ${isSubmitting ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
               >
                 <div className="space-y-1 text-center">
                   <svg
@@ -177,7 +183,7 @@ export default function CreateResourcePage() {
                   <div className="flex text-sm text-gray-600 dark:text-gray-400">
                     <label
                       htmlFor="image"
-                      className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                      className={`relative rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 ${isSubmitting ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                     >
                       <span>Clique para carregar um arquivo</span>
                       <input
@@ -185,6 +191,7 @@ export default function CreateResourcePage() {
                         name="image"
                         type="file"
                         accept="image/*"
+                        disabled={isSubmitting}
                         onChange={handleFileChange}
                         className="sr-only"
                       />
@@ -212,17 +219,27 @@ export default function CreateResourcePage() {
                 id="pricePerHour"
                 type="number"
                 value={pricePerHour}
+                disabled={isSubmitting}
                 onChange={(e) => setPricePerHour(e.target.value)}
-                className="block w-full pl-10 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="block w-full pl-10 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
               />
             </div>
           </div>
           <div>
             <button
               type="submit"
-              className="w-full px-4 py-2 font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
+              disabled={isSubmitting}
+              className="w-full px-4 py-2 font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
             >
-              Cadastrar Recurso
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Cadastrando...
+                </>
+              ) : 'Cadastrar Recurso'}
             </button>
           </div>
         </form>

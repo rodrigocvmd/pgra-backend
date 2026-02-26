@@ -42,6 +42,10 @@ export default function EditResourcePage() {
   // State de controle
   const [resource, setResource] = useState<Resource | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isBlocking, setIsBlocking] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeletingBlock, setIsDeletingBlock] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleteBlockModalOpen, setIsDeleteBlockModalOpen] = useState(false);
@@ -125,6 +129,7 @@ export default function EditResourcePage() {
       return;
     }
 
+    setIsUpdating(true);
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
@@ -149,6 +154,7 @@ export default function EditResourcePage() {
       } else {
         setError('Falha ao atualizar o recurso.');
       }
+      setIsUpdating(false);
     }
   };
 
@@ -163,6 +169,7 @@ export default function EditResourcePage() {
       return;
     }
 
+    setIsBlocking(true);
     try {
       await api.post(`/resource/${id}/block`, {
         blockedStart: new Date(blockStartTime).toISOString(),
@@ -173,7 +180,7 @@ export default function EditResourcePage() {
           Authorization: `Bearer ${token}`,
         },
       });
-      fetchResource();
+      await fetchResource();
       setBlockStartTime('');
       setBlockEndTime('');
       setBlockReason('');
@@ -187,11 +194,14 @@ export default function EditResourcePage() {
       } else {
         setError('Falha ao adicionar período de bloqueio.');
       }
+    } finally {
+      setIsBlocking(false);
     }
   };
 
   const handleDelete = async () => {
     setIsDeleteModalOpen(false);
+    setIsDeleting(true);
     try {
       await api.delete(`/resource/${id}`, {
         headers: {
@@ -205,19 +215,21 @@ export default function EditResourcePage() {
       } else {
         setError('Falha ao deletar o recurso.');
       }
+      setIsDeleting(false);
     }
   };
 
   const handleDeleteBlock = async () => {
     if (selectedBlockId) {
       setIsDeleteBlockModalOpen(false);
+      setIsDeletingBlock(true);
       try {
         await api.delete(`/resource/block/${selectedBlockId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        fetchResource(); // Recarrega os dados do recurso
+        await fetchResource(); // Recarrega os dados do recurso
       } catch (err: unknown) {
         if (err instanceof AxiosError) {
           setError(
@@ -227,12 +239,22 @@ export default function EditResourcePage() {
         } else {
           setError('Falha ao remover o período de bloqueio.');
         }
+      } finally {
+        setIsDeletingBlock(false);
       }
     }
   };
 
   if (isLoading) {
-    return <div className="text-center p-8">Carregando...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-12 space-y-4">
+        <svg className="animate-spin h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <div className="text-xl font-medium text-gray-700 dark:text-gray-300">Carregando recurso...</div>
+      </div>
+    );
   }
 
   return (
@@ -272,8 +294,9 @@ export default function EditResourcePage() {
                 id="name"
                 type="text"
                 value={name}
+                disabled={isUpdating}
                 onChange={(e) => setName(e.target.value)}
-                className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
               />
             </div>
             <div>
@@ -287,8 +310,9 @@ export default function EditResourcePage() {
                 id="description"
                 rows={4}
                 value={description}
+                disabled={isUpdating}
                 onChange={(e) => setDescription(e.target.value)}
-                className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
               />
             </div>
             <div>
@@ -304,7 +328,7 @@ export default function EditResourcePage() {
                   />
                   <label
                     htmlFor="image"
-                    className="cursor-pointer mt-2 inline-block text-sm font-medium text-blue-600 hover:text-blue-500"
+                    className={`mt-2 inline-block text-sm font-medium text-blue-600 hover:text-blue-500 ${isUpdating ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                   >
                     Trocar imagem
                     <input
@@ -312,6 +336,7 @@ export default function EditResourcePage() {
                       name="image"
                       type="file"
                       accept="image/*"
+                      disabled={isUpdating}
                       onChange={handleFileChange}
                       className="sr-only"
                     />
@@ -322,11 +347,11 @@ export default function EditResourcePage() {
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                  className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer ${
+                  className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md ${
                     isDragging
                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-900'
                       : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
-                  }`}
+                  } ${isUpdating ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                 >
                   <div className="space-y-1 text-center">
                     <svg
@@ -346,7 +371,7 @@ export default function EditResourcePage() {
                     <div className="flex text-sm text-gray-600 dark:text-gray-400">
                       <label
                         htmlFor="image"
-                        className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                        className={`relative rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 ${isUpdating ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                       >
                         <span>Clique para carregar um arquivo</span>
                         <input
@@ -354,6 +379,7 @@ export default function EditResourcePage() {
                           name="image"
                           type="file"
                           accept="image/*"
+                          disabled={isUpdating}
                           onChange={handleFileChange}
                           className="sr-only"
                         />
@@ -384,16 +410,26 @@ export default function EditResourcePage() {
                   id="pricePerHour"
                   type="number"
                   value={pricePerHour}
+                  disabled={isUpdating}
                   onChange={(e) => setPricePerHour(e.target.value)}
-                  className="block w-full pl-10 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="block w-full pl-10 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
                 />
               </div>
             </div>
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+              disabled={isUpdating}
+              className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
             >
-              Salvar Alterações
+              {isUpdating ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Salvando Alterações...
+                </>
+              ) : 'Salvar Alterações'}
             </button>
           </form>
         </div>
@@ -418,8 +454,9 @@ export default function EditResourcePage() {
                   id="blockStartTime"
                   type="datetime-local"
                   value={blockStartTime}
+                  disabled={isBlocking}
                   onChange={(e) => setBlockStartTime(e.target.value)}
-                  className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
                   step="1800"
                 />
               </div>
@@ -434,8 +471,9 @@ export default function EditResourcePage() {
                   id="blockEndTime"
                   type="datetime-local"
                   value={blockEndTime}
+                  disabled={isBlocking}
                   onChange={(e) => setBlockEndTime(e.target.value)}
-                  className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
                   step="1800"
                 />
               </div>
@@ -451,16 +489,26 @@ export default function EditResourcePage() {
                 id="blockReason"
                 type="text"
                 value={blockReason}
+                disabled={isBlocking}
                 onChange={(e) => setBlockReason(e.target.value)}
                 placeholder="Ex: Manutenção"
-                className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="block w-full mt-1 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
               />
             </div>
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 cursor-pointer"
+              disabled={isBlocking}
+              className="w-full py-2 px-4 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
             >
-              Adicionar Bloqueio
+              {isBlocking ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Adicionando Bloqueio...
+                </>
+              ) : 'Adicionar Bloqueio'}
             </button>
           </form>
 
@@ -489,9 +537,18 @@ export default function EditResourcePage() {
                       setSelectedBlockId(block.id);
                       setIsDeleteBlockModalOpen(true);
                     }}
-                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 cursor-pointer"
+                    disabled={isDeletingBlock && selectedBlockId === block.id}
+                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                   >
-                    Remover
+                    {isDeletingBlock && selectedBlockId === block.id ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Removendo...
+                      </>
+                    ) : 'Remover'}
                   </button>
                 </div>
               ))
@@ -507,9 +564,18 @@ export default function EditResourcePage() {
         <div className="p-6 rounded-lg">
           <button
             onClick={() => setIsDeleteModalOpen(true)}
-            className="w-full py-2 px-4 bg-orange-700 text-orange-100 border border-red-600 font-bold rounded-md hover:bg-red-100 dark:hover:bg-red-800 cursor-pointer"
+            disabled={isDeleting}
+            className="w-full py-2 px-4 bg-orange-700 text-orange-100 border border-red-600 font-bold rounded-md hover:bg-red-100 dark:hover:bg-red-800 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
           >
-            Deletar Permanentemente este Recurso
+            {isDeleting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Deletando Recurso...
+              </>
+            ) : 'Deletar Permanentemente este Recurso'}
           </button>
         </div>
       </div>
