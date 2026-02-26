@@ -26,7 +26,7 @@ O PGRA foi desenvolvido como um projeto de portfólio para demonstrar competênc
 
 * **Framework:** [Nest.js](https://nestjs.com/)
 * **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
-* **Banco de Dados:** [PostgreSQL](https://www.postgresql.org/)
+* **Banco de Dados:** [PostgreSQL](https://www.postgresql.org/) (Local com Docker ou em nuvem com [Neon](https://neon.tech/))
 * **ORM:** [Prisma](https://www.prisma.io/)
 * **Autenticação:** [JWT](https://jwt.io/) & [Passport.js](http://www.passportjs.org/)
 * **Validação de Dados:** `class-validator`, `class-transformer`
@@ -40,7 +40,8 @@ Para executar este projeto no seu ambiente de desenvolvimento, siga os passos ab
 ### Pré-requisitos
 
 * [Node.js](https://nodejs.org/en/) (v18 ou superior)
-* [Docker](https://www.docker.com/products/docker-desktop/) e Docker Compose
+* [Docker](https://www.docker.com/products/docker-desktop/) e Docker Compose (para banco local)
+* Uma conta no [Neon](https://neon.tech/) (para banco em nuvem - opcional)
 
 ### Instalação e Execução
 
@@ -52,19 +53,21 @@ Para executar este projeto no seu ambiente de desenvolvimento, siga os passos ab
 
 2.  **Crie o arquivo de variáveis de ambiente:**
     * Renomeie o arquivo `.env.example` para `.env`.
-    * Preencha as variáveis de ambiente necessárias, especialmente a `DATABASE_URL` e `JWT_SECRET`. O valor da `DATABASE_URL` no arquivo de exemplo já está configurado para funcionar com o Docker Compose.
+    * Preencha as variáveis de ambiente necessárias.
+    * **Para Neon (Nuvem):** Use o `DATABASE_URL` (com pooler) e `DIRECT_URL` do dashboard do Neon.
+    * **Para Docker (Local):** O valor da `DATABASE_URL` no arquivo de exemplo já está configurado para funcionar com o Docker Compose.
 
-3.  **Suba os containers com Docker Compose:**
-    * Este comando irá construir a imagem da API e iniciar os containers da aplicação e do banco de dados PostgreSQL.
-    ```bash
-    docker-compose up -d --build
-    ```
-
-4.  **Execute as migrações do Prisma:**
-    * Este passo é crucial para criar as tabelas no banco de dados com base no `schema.prisma`.
-    ```bash
-    docker-compose exec api npx prisma migrate dev
-    ```
+3.  **Configurar o Banco de Dados:**
+    * **Opção A: Docker (Local):**
+      ```bash
+      docker-compose up -d --build
+      docker-compose exec api npx prisma migrate dev
+      ```
+    * **Opção B: Neon (Nuvem):**
+      ```bash
+      npm install
+      npx prisma db push
+      ```
 
 A API estará disponível em `http://localhost:3000`. Você pode agora utilizar uma ferramenta como o [Insomnia](https://insomnia.rest/) ou [Postman](https://www.postman.com/) para interagir com os endpoints.
 
